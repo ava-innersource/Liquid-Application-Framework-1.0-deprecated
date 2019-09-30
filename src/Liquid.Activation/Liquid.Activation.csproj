@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <PackageId>LiquidApplication.Activation</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.0-alpha.2</Version>
+    <Version>1.0.0-alpha2</Version>
     <Copyright>Avanade Inc.</Copyright>
     <Description>Base types for exposing business funcionality of Liquid Microservices to frontends and other microservices.</Description>
     <Product>Liquid - Modern Application Framework</Product>

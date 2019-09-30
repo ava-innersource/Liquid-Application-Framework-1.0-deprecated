@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <PackageId>LiquidApplication.OnAWS</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.0-alpha.2</Version>
+    <Version>1.0.0-alpha2</Version>
     <Authors>Avanade Brazil Architect Team - Gustavo Denis; Leonardo Machado; Andersson Pinheiro; Paulo Araujo</Authors>
     <Company>Avanade Inc.</Company>
     <Description>Liquid cartridge for abstraction of the use of Amazon AWS PaaS components by Liquid Microservices.</Description>
