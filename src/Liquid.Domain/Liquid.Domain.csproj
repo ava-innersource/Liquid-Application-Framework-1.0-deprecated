@@ -1,7 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <PackageId>LiquidApplication.Domain</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>1.0.0-alpha.2</Version>
+    <Version>1.0.0-alpha2</Version>
     <Copyright>Avanade Inc.</Copyright>
     <Description>Right level API for wiriting domain (business) logic as Liquid Microservices.</Description>
     <Product>Liquid - Modern Application Framework</Product>

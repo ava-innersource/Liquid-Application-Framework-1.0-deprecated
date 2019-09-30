@@ -1,8 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <PackageId>LiquidApplication.Base</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AssemblyName>Liquid.Base</AssemblyName>
-    <Version>1.0.0-alpha.2</Version>
+    <Version>1.0.0-alpha2</Version>
     <Product>Liquid - Modern Application Framework</Product>
     <Company>Avanade Inc.</Company>
     <Copyright>Avanade Inc.</Copyright>
