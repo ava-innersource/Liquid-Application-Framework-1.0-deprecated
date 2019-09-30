@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <Version>1.0.0-alpha.2</Version>
+    <Authors>Avanade Brazil Architect Team - Gustavo Denis; Leonardo Machado; Andersson Pinheiro; Paulo Araujo</Authors>
+    <Company>Avanade Inc.</Company>
+    <Description>Liquid cartridge for abstraction of the use of Microsoft Azure PaaS components by Liquid Microservices.</Description>
+    <Product>Liquid - Modern Application Framework</Product>
+    <Copyright>Avanade Inc.</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Telemetry\AppInsightsTelemetryMiddleware.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Cache\AzureRedis.cs~RFec478d7.TMP" />
+    <None Remove="Databases\CosmosDB.cs~RF139e84f4.TMP" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.7.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.Kubernetes" Version="1.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Analyzers" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.6.0" />
+    <PackageReference Include="Microsoft.Azure.EventHubs" Version="4.1.0" />
+    <PackageReference Include="Microsoft.Azure.EventHubs.Processor" Version="4.1.0" />
+    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.2.0" />
+    <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Liquid.Base\Liquid.Base.csproj" />
+    <ProjectReference Include="..\Liquid.Domain\Liquid.Domain.csproj" />
+    <ProjectReference Include="..\Liquid.Activation\Liquid.Activation.csproj" />
+    <ProjectReference Include="..\Liquid.Middleware\Liquid.Middleware.csproj" />
+    <ProjectReference Include="..\Liquid.Repository\Liquid.Repository.csproj" />
+    <ProjectReference Include="..\Liquid.Runtime\Liquid.Runtime.csproj" />
+  </ItemGroup>
+</Project>

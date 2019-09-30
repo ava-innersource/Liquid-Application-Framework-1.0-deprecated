@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.0-alpha.2</Version>
+    <Authors>Avanade Brazil Architect Team - Gustavo Denis; Leonardo Machado; Andersson Pinheiro; Paulo Araujo</Authors>
+    <Company>Avanade Inc.</Company>
+    <Product>Liquid - Modern Application Framework</Product>
+    <Description>Liquid cartridge for abstraction of the use of Google Cloud PaaS components by Liquid Microservices.</Description>
+    <Copyright>Avanade Inc.</Copyright>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Google.Cloud.Diagnostics.AspNetCore" Version="3.0.0-beta09" />
+    <PackageReference Include="Google.Cloud.Diagnostics.Common" Version="3.0.0-beta09" />
+    <PackageReference Include="Google.Cloud.Firestore" Version="1.0.0" />
+    <PackageReference Include="Google.Cloud.Monitoring.V3" Version="1.1.0" />
+    <PackageReference Include="Google.Cloud.PubSub.V1" Version="1.0.0" />
+    <PackageReference Include="Google.Cloud.Storage.V1" Version="2.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Liquid.Base\Liquid.Base.csproj" />
+    <ProjectReference Include="..\Liquid.Domain\Liquid.Domain.csproj" />
+    <ProjectReference Include="..\Liquid.Activation\Liquid.Activation.csproj" />
+    <ProjectReference Include="..\Liquid.Middleware\Liquid.Middleware.csproj" />
+    <ProjectReference Include="..\Liquid.Repository\Liquid.Repository.csproj" />
+    <ProjectReference Include="..\Liquid.Runtime\Liquid.Runtime.csproj" />
+  </ItemGroup>
+</Project>
