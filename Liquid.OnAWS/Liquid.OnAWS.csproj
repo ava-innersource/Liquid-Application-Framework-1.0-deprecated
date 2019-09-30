@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <Version>1.0.0-alpha.2</Version>
+    <Authors>Avanade Brazil Architect Team - Gustavo Denis; Leonardo Machado; Andersson Pinheiro; Paulo Araujo</Authors>
+    <Company>Avanade Inc.</Company>
+    <Description>Liquid cartridge for abstraction of the use of Amazon AWS PaaS components by Liquid Microservices.</Description>
+    <Product>Liquid - Modern Application Framework</Product>
+    <Copyright>Avanade Inc.</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.CloudWatch" Version="3.3.102.32" />
+    <PackageReference Include="AWSSDK.CloudWatchEvents" Version="3.3.101.31" />
+    <PackageReference Include="AWSSDK.Core" Version="3.3.103.41" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.101.68" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.104.29" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.66" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.3.102.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Analyzers" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.6.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Liquid.Base\Liquid.Base.csproj" />
+    <ProjectReference Include="..\Liquid.Domain\Liquid.Domain.csproj" />
+    <ProjectReference Include="..\Liquid.Activation\Liquid.Activation.csproj" />
+    <ProjectReference Include="..\Liquid.Middleware\Liquid.Middleware.csproj" />
+    <ProjectReference Include="..\Liquid.Repository\Liquid.Repository.csproj" />
+    <ProjectReference Include="..\Liquid.Runtime\Liquid.Runtime.csproj" />
+  </ItemGroup>
+</Project>
