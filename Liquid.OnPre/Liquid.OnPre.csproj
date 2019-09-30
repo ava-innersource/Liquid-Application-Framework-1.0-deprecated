@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <Version>1.0.0-alpha.2</Version>
+    <Authors>Avanade Brazil Architect Team - Gustavo Denis; Leonardo Machado; Andersson Pinheiro; Paulo Araujo</Authors>
+    <Company>Avanade Inc.</Company>
+    <Description>Liquid cartridge for abstraction of the use of Microsoft Azure PaaS components by Liquid Microservices.</Description>
+    <Product>Liquid - Modern Application Framework</Product>
+    <Copyright>Avanade Inc.</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Liquid.Base\Liquid.Base.csproj" />
+    <ProjectReference Include="..\Liquid.Domain\Liquid.Domain.csproj" />
+    <ProjectReference Include="..\Liquid.Activation\Liquid.Activation.csproj" />
+    <ProjectReference Include="..\Liquid.Middleware\Liquid.Middleware.csproj" />
+    <ProjectReference Include="..\Liquid.Repository\Liquid.Repository.csproj" />
+    <ProjectReference Include="..\Liquid.Runtime\Liquid.Runtime.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Hubs\" />
+    <Folder Include="Storages\" />
+    <Folder Include="Telemetry\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Runtime.Caching" Version="4.6.0-preview6.19303.8" />
+  </ItemGroup>
+</Project>

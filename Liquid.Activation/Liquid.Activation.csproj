@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <Version>1.0.0-alpha.2</Version>
+    <Copyright>Avanade Inc.</Copyright>
+    <Description>Base types for exposing business funcionality of Liquid Microservices to frontends and other microservices.</Description>
+    <Product>Liquid - Modern Application Framework</Product>
+    <Company>Avanade Inc.</Company>
+    <Authors>Avanade Brazil Architect Team - Gustavo Denis; Leonardo Machado; Andersson Pinheiro; Paulo Araujo</Authors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="ServiceBus\**" />
+    <EmbeddedResource Remove="ServiceBus\**" />
+    <None Remove="ServiceBus\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Liquid.Base\Liquid.Base.csproj" />
+    <ProjectReference Include="..\Liquid.Domain\Liquid.Domain.csproj" />
+  </ItemGroup>
+</Project>

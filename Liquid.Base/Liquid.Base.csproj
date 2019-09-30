@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AssemblyName>Liquid.Base</AssemblyName>
+    <Version>1.0.0-alpha.2</Version>
+    <Product>Liquid - Modern Application Framework</Product>
+    <Company>Avanade Inc.</Company>
+    <Copyright>Avanade Inc.</Copyright>
+    <Description>Main abstractions for building Liquid Microservices.</Description>
+    <Authors>Avanade Brazil Architect Team - Gustavo Denis; Leonardo Machado; Andersson Pinheiro; Paulo Araujo</Authors>
+    <PackageId>Liquid.Base</PackageId>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="WorkBench.cs~RF6a113e7.TMP" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\newtonsoft.json\11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
