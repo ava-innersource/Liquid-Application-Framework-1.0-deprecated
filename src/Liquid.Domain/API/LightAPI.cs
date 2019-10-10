@@ -18,7 +18,6 @@ namespace Liquid.Domain.API
     /// </summary>
     public sealed class LightApi : AbstractApiWrapper
     {
-        #region Class Definition
         private ICriticHandler CritictHandler { get; set; }
         private HttpClient httpClient = new HttpClient();
 
@@ -50,11 +49,8 @@ namespace Liquid.Domain.API
             _endpoint = _suffix + "/";
         }
 
-        #endregion
 
-        #region Public Methods
 
-        #region Sync Methods
 
         /// <summary>
         ///  Methods Sync that GETs the object that processes requests for the route.
@@ -260,11 +256,8 @@ namespace Liquid.Domain.API
             }
         }
 
-        #endregion
 
-        #endregion
 
-        #region Private Methods
 
         /// <summary>
         /// Send a POST or PUT operation expecting a result from a JSON type.
@@ -616,7 +609,6 @@ namespace Liquid.Domain.API
                 throw new LightException($"Error on API call Rest. OP: {operation} || SR: {MakeUri(serviceRoute)} || BD: {exBody} || HD: {sb.ToString()} || EX: {ex.Message} || ST:{ex.StackTrace}", ex);
             }
         }
-        #endregion
 
     }
 }

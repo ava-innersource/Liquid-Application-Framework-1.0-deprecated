@@ -145,7 +145,6 @@ namespace Liquid
             _isServicesUp = true;
         }
 
-        #region Unit Test
         /// <summary>
         /// Prepare Workbench to start Unit Test
         /// </summary>
@@ -167,7 +166,6 @@ namespace Liquid
         {
             InitializeServices();
         }
-        #endregion
 
     }
 }

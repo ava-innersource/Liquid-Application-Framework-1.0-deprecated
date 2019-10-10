@@ -10,7 +10,6 @@ namespace Liquid.Activation
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class HubAttribute : Attribute
     {
-        #region Private Var
         /// <summary>
         /// Private configuration name.
         /// </summary>
@@ -21,9 +20,7 @@ namespace Liquid.Activation
         /// </summary>
         private readonly string _hubname;
 
-        #endregion
 
-        #region Constructor
 
         /// <summary>
         /// Constructor used to inform a Hub name.
@@ -35,9 +32,7 @@ namespace Liquid.Activation
             _hubname = hubname;
         }
 
-        #endregion
 
-        #region Properties
         /// <summary>
         /// Get a Config Tag Hub Name.
         /// </summary>
@@ -54,6 +49,5 @@ namespace Liquid.Activation
             get { return _hubname; }
         }
 
-        #endregion
     }
 }

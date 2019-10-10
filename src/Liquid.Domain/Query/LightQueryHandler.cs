@@ -20,10 +20,8 @@ namespace Liquid.Domain
 
         protected abstract DomainResponse Handle();
 
-        #region Internal Methods
         internal override void ExternalInheritanceNotAllowed()
         { }
-        #endregion
     }
 }
 

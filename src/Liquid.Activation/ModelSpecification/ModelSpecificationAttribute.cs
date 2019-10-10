@@ -10,7 +10,6 @@ namespace Liquid.Activation
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
     public class ModelSpecificationAttribute : Attribute
     {
-        #region Constructor
 
         /// <summary>
         /// Constructor used to Domain Model Specification.
@@ -33,6 +32,5 @@ namespace Liquid.Activation
 			Description = description;
 		}
 
-		#endregion
 	}
 }

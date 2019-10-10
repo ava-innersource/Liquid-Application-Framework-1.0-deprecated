@@ -447,7 +447,6 @@ namespace Liquid.OnAWS
             throw new NotImplementedException();
         }
 
-        #region Optimistic Concurrency     
         /// <summary>
         /// Implement a condition optimistic. In this case the value eTag will be used for control on optimist concurrency.
         /// </summary>
@@ -483,6 +482,5 @@ namespace Liquid.OnAWS
                 return LightHealth.HealthCheck.Unhealthy;
             }   
         }
-        #endregion
     }
 }

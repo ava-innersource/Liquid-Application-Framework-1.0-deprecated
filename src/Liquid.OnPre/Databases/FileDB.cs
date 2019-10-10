@@ -212,7 +212,6 @@ namespace Liquid.OnWindowsClient
         }
 
 
-        #region NotImplemented
         /// <summary>
         /// Add or update the document
         /// Calls the base class because there may be some generic behavior in it
@@ -483,6 +482,5 @@ namespace Liquid.OnWindowsClient
         {
             throw new NotImplementedException();
         }
-        #endregion
     }
 }
