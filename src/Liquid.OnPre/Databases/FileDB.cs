@@ -1,4 +1,5 @@
-﻿using Liquid.Interfaces;
+﻿using Liquid.Domain;
+using Liquid.Interfaces;
 using Liquid.Repository;
 using Liquid.Runtime.Configuration.Base;
 using Newtonsoft.Json.Linq;
@@ -7,9 +8,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace Liquid.OnWindowsClient
+namespace Liquid.OnPre
 {
     /// <summary>
     /// Provides a unique namespace to store and access your File data objects.
@@ -65,6 +67,29 @@ namespace Liquid.OnWindowsClient
                 _path += "\\";
             }
         }
+
+        /// <summary>
+        /// Decode
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        private string Decode(string data)
+        {
+            Byte[] b = Convert.FromBase64String(data);
+            string descriptografaConnectionString = UTF8Encoding.UTF8.GetString(b);
+            return descriptografaConnectionString;
+        }
+        /// <summary>
+        /// Encode
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private string Encode(string data)
+        {
+            Byte[] b = UTF8Encoding.UTF8.GetBytes(data);
+            string criptografaConnectionString = Convert.ToBase64String(b);
+            return criptografaConnectionString;
+        }
         /// <summary>
         /// Create root folder 
         /// </summary>
@@ -91,7 +116,8 @@ namespace Liquid.OnWindowsClient
             }
             using (StreamWriter str = new StreamWriter(fullPath))
             {
-                str.Write(model.ToJsonCamelCase());
+                string data = Encode(model.ToJsonCamelCase().ToString());
+                str.Write(data);
             }
         }
         /// <summary>
@@ -105,10 +131,24 @@ namespace Liquid.OnWindowsClient
             T ligthModel = default(T);
             if (File.Exists(fullPath))
             {
-                JToken json = JToken.Parse(File.ReadAllText(fullPath));
+                string data = Decode(File.ReadAllText(fullPath));
+                JToken json = JToken.Parse(data);
                 ligthModel = json.ToObject<T>();
             }
             return ligthModel;
+        }
+        /// <summary>
+        /// Calls the base class because there may be some generic behavior in it
+        /// Get the Generic object
+        /// </summary>
+        /// <typeparam name="T">generic type</typeparam> 
+        /// <returns>The generic object</returns>
+        public override async Task<IQueryable<T>> GetAsync<T>()
+        {
+            await base.GetAsync<T>();
+            List<T> models = await GetAllDocumentAsync<T>(typeof(T).Name);
+            dynamic query = models.AsQueryable();
+            return await Task.FromResult<IQueryable<T>>(query);
         }
         /// <summary>
         /// Creat Document
@@ -119,14 +159,15 @@ namespace Liquid.OnWindowsClient
             CreateFolder(collection);
             string fullPath = $"{ _path}{collection}";
             List<T> ligthModels = new List<T>();
-            FileInfo[] Files = new DirectoryInfo(_path).GetFiles(collection, SearchOption.TopDirectoryOnly);
-            if (Files.Count() > 0)
+            FileInfo[] Files = new DirectoryInfo(fullPath).GetFiles("*.*", SearchOption.TopDirectoryOnly);
+            if (Files.Any())
             {
                 foreach (FileInfo fileInfo in Files)
                 {
                     string arquivo = fileInfo.FullName;
                     T ligthModel = default(T);
-                    JToken json = JToken.Parse(File.ReadAllText(fileInfo.FullName));
+                    string data = Decode(File.ReadAllText(fileInfo.FullName));
+                    JToken json = JToken.Parse(data);
                     ligthModel = json.ToObject<T>();
                     ligthModels.Add(ligthModel);
                 }
@@ -144,15 +185,31 @@ namespace Liquid.OnWindowsClient
         {
             await base.AddOrUpdateAsync(model);
             Guid id = Guid.NewGuid();
-            dynamic lightModel = model;
-            if (string.IsNullOrEmpty(lightModel.id))
-                lightModel.id = id;
+            if (string.IsNullOrEmpty(model.id))
+                model.id = id.ToString();
 
-            CreateOrUpdateDocument(typeof(T).GetType().Name, lightModel);
+            CreateOrUpdateDocument<T>(typeof(T).Name, model);
 
-            return await Task.FromResult<T>(lightModel);
+            return await Task.FromResult<T>(model);
         }
-
+        /// <summary>
+        /// Creat Document
+        /// </summary>
+        /// <param name="collection"></param>
+        private void CreateOrUpdateDocument<T>(string collection, T model) where T : ILightModel
+        {
+            CreateFolder(collection);
+            string fullPath = $"{ _path}{collection}\\{model.id}.json";
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
+            using (StreamWriter str = new StreamWriter(fullPath))
+            {
+                string data = Encode(model.ToJsonCamelCase().ToString());
+                str.Write(data);
+            }
+        }
         /// <summary>
         /// Get the document by id
         /// Calls the base class because there may be some generic behavior in it
@@ -164,7 +221,7 @@ namespace Liquid.OnWindowsClient
         {
             await base.GetByIdAsync<T>(entityId);
 
-            dynamic model = GetDocumentAsync<T>(typeof(T).Name, entityId);
+            T model = await GetDocumentAsync<T>(typeof(T).Name, entityId);
 
             return await Task.FromResult<T>(model);
         }
@@ -402,8 +459,12 @@ namespace Liquid.OnWindowsClient
         public override async Task DeleteAsync<T>(string entityId)
         {
             await base.DeleteAsync<T>(entityId);
+            string fullPath = $"{ _path}{typeof(T).Name}\\{entityId}.json";
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
 
-            throw new NotImplementedException();
         }
 
         /// <summary>

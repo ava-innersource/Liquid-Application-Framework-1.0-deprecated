@@ -1,7 +1,7 @@
 ﻿using FluentValidation; 
 using Liquid.Runtime.Configuration;
 
-namespace Liquid.OnWindowsClient
+namespace Liquid.OnPre
 {
     /// <summary>
     /// The Configuration for FileConfiguration
@@ -18,7 +18,10 @@ namespace Liquid.OnWindowsClient
         /// </summary>
         public override void Validate()
         {
-            RuleFor(d => Path).NotEmpty().WithMessage("Path on File settings should not be empty.");
+            if (string.IsNullOrEmpty(Path))
+            {
+                Path = @"AppData\";
+            }
         }
     }
 }

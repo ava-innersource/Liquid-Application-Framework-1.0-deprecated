@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>1.0.0-alpha2</Version>
-    <Authors>Avanade Brazil Architect Team - Gustavo Denis; Leonardo Machado; Andersson Pinheiro; Paulo Araujo</Authors>
+    <Authors>Avanade Brazil Architect Team - Gustavo Denis; Leonardo Freitas; Andersson Pinheiro; Paulo Araujo</Authors>
     <Company>Avanade Inc.</Company>
     <Product>Liquid - Modern Application Framework</Product>
     <Description>Liquid cartridge for abstraction of the use of Google Cloud PaaS components by Liquid Microservices.</Description>

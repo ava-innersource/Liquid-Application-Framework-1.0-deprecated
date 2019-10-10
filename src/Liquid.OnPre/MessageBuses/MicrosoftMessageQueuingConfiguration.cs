@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Liquid.Runtime.Configuration;
 
-namespace Liquid.OnWindowsClient
+namespace Liquid.OnPre
 {
     /// <summary>
     ///  Configuration of the for connect a Service Bus (Queue / Topic).

@@ -8,7 +8,7 @@
     <Description>Right level API for wiriting domain (business) logic as Liquid Microservices.</Description>
     <Product>Liquid - Modern Application Framework</Product>
     <Company>Avanade Inc.</Company>
-    <Authors>Avanade Brazil Architect Team - Gustavo Denis; Leonardo Machado; Andersson Pinheiro; Paulo Araujo</Authors>
+    <Authors>Avanade Brazil Architect Team - Gustavo Denis; Leonardo Freitas; Andersson Pinheiro; Paulo Araujo</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

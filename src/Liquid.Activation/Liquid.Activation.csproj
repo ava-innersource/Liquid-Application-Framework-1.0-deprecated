@@ -8,7 +8,7 @@
     <Description>Base types for exposing business funcionality of Liquid Microservices to frontends and other microservices.</Description>
     <Product>Liquid - Modern Application Framework</Product>
     <Company>Avanade Inc.</Company>
-    <Authors>Avanade Brazil Architect Team - Gustavo Denis; Leonardo Machado; Andersson Pinheiro; Paulo Araujo</Authors>
+    <Authors>Avanade Brazil Architect Team - Gustavo Denis; Leonardo Freitas; Andersson Pinheiro; Paulo Araujo</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -23,5 +23,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Liquid.Base\Liquid.Base.csproj" />
     <ProjectReference Include="..\Liquid.Domain\Liquid.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Scheduler\" />
   </ItemGroup>
 </Project>

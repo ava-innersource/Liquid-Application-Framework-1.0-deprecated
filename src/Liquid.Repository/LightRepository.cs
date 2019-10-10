@@ -191,7 +191,7 @@ namespace Liquid.Repository
         /// <typeparam name="T">Generic Type</typeparam>
         /// <param name="model">Domain Model</param>
         /// <returns>Returns the result of the operation</returns>
-        public virtual Task<T> AddOrUpdateAsync<T>(T model)
+        public virtual Task<T> AddOrUpdateAsync<T>(T model) where T : ILightModel
         {
             CheckSetup<T>();  //Prevents direct instantiation of a repository without a sufix
             ValidateAndCheck(model);
@@ -208,7 +208,7 @@ namespace Liquid.Repository
         /// <typeparam name="T"></typeparam>
         /// <param name="listModels"></param>
         /// <returns>Returns the result of the operation</returns>
-        public virtual Task<IEnumerable<T>> AddOrUpdateAsync<T>(List<T> listModels)
+        public virtual Task<IEnumerable<T>> AddOrUpdateAsync<T>(List<T> listModels) where T : ILightModel
         {
             CheckSetup<T>();  //Prevents direct instantiation of a repository without a sufix
             ValidateAndCheckList(listModels);

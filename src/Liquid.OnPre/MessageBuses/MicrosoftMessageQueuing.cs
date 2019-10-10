@@ -10,7 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Liquid.OnWindowsClient
+namespace Liquid.OnPre
 {
     /// <summary>
     /// Implementation of the communication component between queues and topics of the Azure, this class is specific to azure

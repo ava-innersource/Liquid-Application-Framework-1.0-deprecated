@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Runtime.Caching;
 using Liquid.Runtime.Configuration.Base;
 
-namespace Liquid.OnWindowsClient
+namespace Liquid.OnPre
 {
     /// <summary>
     ///  Include support of MemoryCache, that processing data included on Configuration file.
@@ -23,12 +23,12 @@ namespace Liquid.OnWindowsClient
         /// Initialize support of Cache and read file config
         /// </summary>
         public override void Initialize()
-        {
+        { 
             config = LightConfigurator.Config<MemoryCacheConfiguration>("MemoryCache");
             options = new CacheItemPolicy()
             {
-                SlidingExpiration = TimeSpan.FromSeconds(config.SlidingExpirationSeconds),
-                AbsoluteExpiration = DateTimeOffset.FromUnixTimeSeconds(config.AbsoluteExpirationRelativeToNowSeconds)
+                SlidingExpiration = (config.SlidingExpirationSeconds.HasValue && config.SlidingExpirationSeconds > 0) ? TimeSpan.FromSeconds(config.SlidingExpirationSeconds.Value) : ObjectCache.NoSlidingExpiration,
+                AbsoluteExpiration = (config.AbsoluteExpirationRelativeToNowSeconds.HasValue && config.AbsoluteExpirationRelativeToNowSeconds > 0) ? DateTimeOffset.UtcNow.AddSeconds(config.AbsoluteExpirationRelativeToNowSeconds.Value) : ObjectCache.InfiniteAbsoluteExpiration
             };
         }
         /// <summary>

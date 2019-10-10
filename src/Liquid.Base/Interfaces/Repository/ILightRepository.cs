@@ -16,8 +16,8 @@ namespace Liquid.Interfaces
     {
 
         void SetMediaStorage(ILightMediaStorage mediaStorage);        
-        Task<T> AddOrUpdateAsync<T>(T model);
-        Task<IEnumerable<T>> AddOrUpdateAsync<T>(List<T> listModels);
+        Task<T> AddOrUpdateAsync<T>(T model) where T : ILightModel;
+        Task<IEnumerable<T>> AddOrUpdateAsync<T>(List<T> listModels) where T : ILightModel;
         Task<ILightAttachment> AddOrUpdateAttachmentAsync<T>(string entityId, string fileName, Stream attachment);
         Task<ILightAttachment> GetAttachmentAsync<T>(string entityId, string fileName);
         Task<IEnumerable<ILightAttachment>> ListAttachmentsByIdAsync<T>(string entityId);
