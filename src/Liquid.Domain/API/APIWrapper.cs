@@ -18,7 +18,6 @@ namespace Liquid.Domain.API
     /// </summary>
     public class ApiWrapper : AbstractApiWrapper
     {
-        #region Class Definition
         /// <summary>
         /// Initilizes API from fixed hostname and port
         /// </summary>
@@ -46,9 +45,7 @@ namespace Liquid.Domain.API
         /// <param name="apiName">name of the API</param>
         /// <param name="token">token authentication</param>
         public ApiWrapper(string apiName, string token) : base($"{nameof(ApiWrapper)}:{apiName}", token) { } 
-        #endregion
 
-        #region Public Methods
 
         /// <summary>
         /// Methods that gets the object that processes requests for the route.
@@ -262,9 +259,7 @@ namespace Liquid.Domain.API
             };
         }
 
-        #endregion
 
-        #region Private Methods
 
         /// <summary>
         /// Send a POST or PUT operation expecting a result from a JSON type.
@@ -495,6 +490,5 @@ namespace Liquid.Domain.API
             }
         }
 
-        #endregion
     }
 }

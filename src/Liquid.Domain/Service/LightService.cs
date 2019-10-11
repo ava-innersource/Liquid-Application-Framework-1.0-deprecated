@@ -16,9 +16,7 @@ namespace Liquid.Domain
             return domain;
         }
 
-        #region Internal Methods
         internal override void ExternalInheritanceNotAllowed()
         { }
-        #endregion
     }
 }

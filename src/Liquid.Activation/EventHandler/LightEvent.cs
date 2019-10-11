@@ -17,14 +17,11 @@ namespace Liquid.Activation
     /// </summary>
     public abstract class LightEvent : ILightEvent
     {
-        #region Properties 
         protected readonly static Dictionary<TypeInfo, HubAttribute> _eventCache = new Dictionary<TypeInfo, HubAttribute>();
         //Cloning TLightelemetry service singleton because it services multiple LightDomain instances from multiple threads with instance variables
         private readonly ILightTelemetry _telemetry = WorkBench.Telemetry != null ? (ILightTelemetry)WorkBench.Telemetry.CloneService() : null;
         protected ILightTelemetry Telemetry => _telemetry;
-        #endregion
 
-        #region Methods
 
         /// <summary>
         /// Implementation of the start process to discovery by reflection the LightEvent
@@ -85,6 +82,5 @@ namespace Liquid.Activation
         public abstract Task<T> SendToHub<T>(T model, string dataOperation);
 
         public abstract LightHealth.HealthCheck HealthCheck(string serviceKey, string value);
-        #endregion
     }
 }

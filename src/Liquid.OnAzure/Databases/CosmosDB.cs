@@ -730,7 +730,6 @@ namespace Liquid.OnAzure
             }
         }
 
-        #region Optimistic Concurrency     
         /// <summary>
         /// Implement a condition optimistic. In this case the value eTag will be used for control on optimist concurrency.
         /// </summary>
@@ -752,9 +751,7 @@ namespace Liquid.OnAzure
             }
             return new RequestOptions() { AccessCondition = new AccessCondition() { Type = AccessConditionType.IfNoneMatch } };
         }
-        #endregion
 
-        #region Database Implements
 
         /// <summary>
         /// Get Azure Cosmos DB Connection
@@ -859,6 +856,5 @@ namespace Liquid.OnAzure
             return jsonString;
         }
 
-        #endregion
     }
 }

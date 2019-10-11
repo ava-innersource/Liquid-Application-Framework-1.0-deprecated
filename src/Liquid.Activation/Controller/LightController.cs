@@ -28,7 +28,6 @@ namespace Liquid.Activation
         private readonly CriticHandler _criticHandler = new CriticHandler();
         public IHttpContextAccessor _httpContextAccessor;
 
-        #region Repository Factory
 
         private LightContext GetContext()
         {
@@ -169,7 +168,6 @@ namespace Liquid.Activation
                 }
             }
         }
-        #endregion
 
     }
 }
