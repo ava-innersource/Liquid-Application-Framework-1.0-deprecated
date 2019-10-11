@@ -10,7 +10,6 @@ namespace Liquid.Activation
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class QueueAttribute : Attribute
     {
-        #region Private Var
         /// <summary>
         /// Private Queue Name.
         /// </summary>
@@ -24,9 +23,7 @@ namespace Liquid.Activation
         /// </summary>
         private readonly int _takeQuantity;
 
-        #endregion
 
-        #region Constructor
 
         /// <summary>
         /// Constructor used to inform a Queue name.
@@ -40,9 +37,7 @@ namespace Liquid.Activation
             _deleteAfterRead = deleteAfterRead;
         }
 
-        #endregion
 
-        #region Properties
         /// <summary>
         /// Get a Queue Name.
         /// </summary>
@@ -67,6 +62,5 @@ namespace Liquid.Activation
             get { return _deleteAfterRead; }
         }
 
-        #endregion
     }
 }

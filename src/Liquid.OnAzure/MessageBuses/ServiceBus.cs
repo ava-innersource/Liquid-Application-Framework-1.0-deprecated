@@ -18,7 +18,6 @@ namespace Liquid.OnAzure
     /// </summary>
     public class ServiceBus : LightWorker, IWorkBenchHealthCheck
     {
-        #region override methods 
         /// <summary>
         /// Implementation of the start process queue and process topic. It must be called  parent before start processes.
         /// </summary>
@@ -52,9 +51,7 @@ namespace Liquid.OnAzure
             return config.ConnectionString;
         }
 
-        #endregion
 
-        #region private Methods 
         /// <summary>
         /// If  an error occurs in the processing, this method going to called
         /// </summary>
@@ -213,7 +210,6 @@ namespace Liquid.OnAzure
         }
 
 
-        #endregion
         /// <summary>
         /// Method to run Health Check for Service Bus
         /// </summary>

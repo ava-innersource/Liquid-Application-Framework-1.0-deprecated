@@ -9,7 +9,6 @@ namespace Liquid.Base.Domain
     /// </summary>
     public abstract class LightDomain : ILightDomain
     {
-        #region Protected Variables
         protected bool HasNotFoundError { get; set; }
         protected ILightRepository Repository => WorkBench.Repository;
         protected ILightMediaStorage MediaStorage => WorkBench.MediaStorage;
@@ -20,15 +19,11 @@ namespace Liquid.Base.Domain
         protected bool HasBusinessErrors => _criticHandler != null && _criticHandler.HasBusinessErrors;
         private ICriticHandler _criticHandler { get; set; }
         public ICriticHandler CritictHandler { get { return _criticHandler; } set { _criticHandler = value; } }
-        #endregion
 
-        #region Internal Methods
         internal abstract void ExternalInheritanceNotAllowed();
 
-        #endregion
 
 
-        #region Protected Methods
         /// <summary>
         /// Add to the scope that some critic has a not found type of error
         /// </summary>
@@ -120,9 +115,7 @@ namespace Liquid.Base.Domain
             return response;
         }
 
-        #endregion
 
-        #region Static Methods
 
         /// <summary>
         /// Returns a  instance of a LightDomain class for calling business domain logic
@@ -135,7 +128,6 @@ namespace Liquid.Base.Domain
             return (T)service;
         }
 
-        #endregion
 
     }
 }

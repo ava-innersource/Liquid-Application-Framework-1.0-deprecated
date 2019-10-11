@@ -17,7 +17,6 @@ namespace Liquid.OnWindowsClient
     /// </summary>
     public class MicrosoftMessageQueuing : LightWorker 
     {
-        #region override methods 
         /// <summary>
         /// Implementation of the start process queue and process topic. It must be called  parent before start processes.
         /// </summary>
@@ -51,7 +50,6 @@ namespace Liquid.OnWindowsClient
             return config.ConnectionString;
         }
 
-        #endregion
 
 
         /// <summary>

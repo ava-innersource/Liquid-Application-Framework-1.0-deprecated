@@ -9,7 +9,6 @@ namespace Liquid.Activation
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class TopicAttribute : Attribute
     {
-        #region Private Var
         /// <summary>
         /// Private Topic Name
         /// </summary>
@@ -31,9 +30,7 @@ namespace Liquid.Activation
         /// </summary>
         private readonly int _takeQuantity;
 
-        #endregion
 
-        #region Constructor
 
         /// <summary>
         /// Constructor used to inform a Topic, Subscription name and Sql Filter.
@@ -50,9 +47,7 @@ namespace Liquid.Activation
             _deleteAfterRead = deleteAfterRead;
         }
 
-        #endregion
 
-        #region Properties
         /// <summary>
         /// Topic Name
         /// </summary>
@@ -92,6 +87,5 @@ namespace Liquid.Activation
         {
             get { return _deleteAfterRead; }
         }
-        #endregion
     }
 }

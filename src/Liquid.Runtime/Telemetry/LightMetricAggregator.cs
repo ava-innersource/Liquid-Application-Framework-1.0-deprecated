@@ -11,7 +11,6 @@ namespace Liquid.Runtime.Telemetry
     {
         private readonly SpinLock _trackLock = new SpinLock();
 
-        #region Properties for the aggreation 
         public DateTimeOffset StartTimestamp { get; }
         public int Count { get; private set; }
         public double Sum { get; private set; }
@@ -28,7 +27,6 @@ namespace Liquid.Runtime.Telemetry
         }
         public double StandardDeviation { get { return Math.Sqrt(Variance); } }
 
-        #endregion
 
         ///Constructor necessary for take the timestamp that the matric will be tracked
         public LightMetricAggregator(DateTimeOffset startTimestamp)

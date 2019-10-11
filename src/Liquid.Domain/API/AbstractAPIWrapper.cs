@@ -80,9 +80,7 @@ namespace Liquid.Domain.API
             }
         }
 
-        #region Public Methods
 
-        #region Async Methods
         /// <summary>
         ///   Method that asynchronously gets the object that processes requests for the route.
         /// </summary>
@@ -168,9 +166,7 @@ namespace Liquid.Domain.API
         }
         protected abstract Task<T> SendAsync<T>(string operation, string serviceRoute, FormUrlEncodedContent body, Dictionary<string, string> headers);
 
-        #endregion
 
-        #region Sync Methods
 
         /// <summary>
         ///  Methods Sync that GETs the object that processes requests for the route.
@@ -230,9 +226,7 @@ namespace Liquid.Domain.API
 
         public abstract DomainResponse Delete(string serviceRoute, [Optional]Dictionary<string, string> headers);
 
-        #endregion
 
-        #endregion
 
         /// <summary>
         /// Constructs the serviceRoute to the APIWrapper
