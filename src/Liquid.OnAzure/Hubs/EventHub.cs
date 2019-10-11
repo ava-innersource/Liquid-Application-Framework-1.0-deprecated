@@ -16,13 +16,10 @@ namespace Liquid.OnAzure.Hubs
 {
     public class EventHub : LightWorker, IWorkBenchHealthCheck
     {
-        #region private properties
 
         HubConfiguration config = null;
 
-        #endregion
 
-        #region override methods 
         /// <summary>
         /// Implementation of the start process queue and process topic. It must be called  parent before start processes.
         /// </summary>
@@ -52,9 +49,7 @@ namespace Liquid.OnAzure.Hubs
 
             return config.ConnectionString;
         }
-        #endregion
 
-        #region private Methods 
         /// <summary>
         /// If  an error occurs in the processing, this method going to called
         /// </summary>
@@ -141,6 +136,5 @@ namespace Liquid.OnAzure.Hubs
 
         }
 
-        #endregion
     }
 }

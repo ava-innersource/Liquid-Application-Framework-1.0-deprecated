@@ -86,7 +86,6 @@ namespace Liquid.Repository
             return Predicate?.ToString();
         }
 
-        #region Implicit Operators
         /// <summary>
         /// Allows this object to be implicitely converted to an Expression{Func{T, bool}}.
         /// </summary>
@@ -116,9 +115,7 @@ namespace Liquid.Repository
         {
             return right == null ? null : new LightExpression<T>(right);
         }
-        #endregion
 
-        #region Implement LamdaExpression methods and properties
 
         /// <summary>
         /// Body
@@ -140,6 +137,5 @@ namespace Liquid.Repository
         /// </summary>
         public Type Type => Predicate.Type;
 
-        #endregion
     }
 }

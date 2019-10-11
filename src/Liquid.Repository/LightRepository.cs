@@ -449,7 +449,6 @@ namespace Liquid.Repository
             return Task.FromResult<ILightPaging<T>>(new LightPaging<T>());
         }
 
-        #region Optimistic Concurrency
         private delegate bool RawGeneric(Type generic, Type tocheck);
 
         private readonly RawGeneric _rawGeneric = (generic, toCheck) =>
@@ -481,9 +480,7 @@ namespace Liquid.Repository
         /// <returns></returns>
         public abstract LightHealth.HealthCheck HealthCheck(string serviceKey, string value);
 
-        #endregion
 
-        #region Event Handler
 
         /// <summary>
         /// While in abstract layer, this method calls the LightEvent per CRUD operations in repository
@@ -508,6 +505,5 @@ namespace Liquid.Repository
 
             return Task.FromResult<T>(default(T));
         }
-        #endregion
     }
 }

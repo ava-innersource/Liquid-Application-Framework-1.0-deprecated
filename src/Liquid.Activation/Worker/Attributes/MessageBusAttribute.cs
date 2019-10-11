@@ -10,15 +10,12 @@ namespace Liquid.Activation
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public class MessageBusAttribute : Attribute
     {
-        #region Private Var
         /// <summary>
         /// Private configuration name.
         /// </summary>
         private readonly string _config;
 
-        #endregion
 
-        #region Constructor
 
         /// <summary>
         /// Constructor used to inform a Configuration Tag Name.
@@ -29,9 +26,7 @@ namespace Liquid.Activation
             _config = configTagName;
         }
 
-        #endregion
 
-        #region Properties
         /// <summary>
         /// Get a Configuration Tag Name.
         /// </summary>
@@ -40,6 +35,5 @@ namespace Liquid.Activation
             get { return _config; }
         }
 
-        #endregion
     }
 }

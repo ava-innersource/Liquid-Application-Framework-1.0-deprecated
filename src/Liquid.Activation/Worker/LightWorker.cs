@@ -22,7 +22,6 @@ namespace Liquid.Activation
     /// </summary>
     public abstract class LightWorker : LightBackgroundTask, ILightWorker
     {
-        #region Properties 
         protected readonly static Dictionary<MethodInfo, QueueAttribute> _queues = new Dictionary<MethodInfo, QueueAttribute>();
         protected readonly static Dictionary<MethodInfo, TopicAttribute> _topics = new Dictionary<MethodInfo, TopicAttribute>();
         private readonly List<string> _inputValidationErrors = new List<string>();
@@ -30,9 +29,7 @@ namespace Liquid.Activation
 		protected ILightCache Cache => WorkBench.Cache;
         //Instance of CriticHandler to inject on the others classes
         private readonly CriticHandler _criticHandler = new CriticHandler();
-        #endregion
 
-        #region    Methods         
         /// <summary>
         /// Discovery the key connection defined on the implementation of the LightWorker
         /// </summary>
@@ -282,6 +279,5 @@ namespace Liquid.Activation
             return response;
         }
 
-        #endregion
     }
 }
