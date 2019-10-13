@@ -1,25 +1,34 @@
-[](https://github.com/Avanade/Liquid-Application-Framework/workflows/ASP.NET%20Core%20CI/badge.svg)
+# Enter Liquid ![CI Badge](https://github.com/Avanade/Liquid-Application-Framework/workflows/ASP.NET%20Core%20CI/badge.svg)
+Liquid is a **multi-cloud** framework designed to **accelerate the development** of cloud-native microservices while avoiding coupling your code to specific cloud providers. 
 
-# Introduction
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+When writing Liquid applications, you stop worrying about the technology and focus on your business - Liquid abstracts most of the boilerplate and let you just write domain code that looks great and gets the job done.
 
+## Features
 
-Take a look at [Liquid Documentation](https://amaw.visualstudio.com/AMAW/_wiki/wikis/Asset.wiki)
+- Abstracts a number of services from cloud providers such as Azure, AWS and Google Cloud to enable you to write code that will run anywhere.
+- Brings a directed programming model that will save you time on thinking how to structure your application, allowing you to focus on writing business code.
 
 # Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+To use Liquid, you create a new base ASP.Net application and then download and install the following nuget packages:
+
+- Liquid.Base
+- LiquidApplication.Activation
+- LiquidApplication.Domain
+- LiquidApplication.Middleware
+- LiquidApplication.Repository
+- LiquidApplication.Runtime
+
+And then choose what implementation cartridge you need to run your environment:
+
+- If you'll deploy your application to Azure, install `LiquidApplication.OnAzure`
+- If you'll deploy your application to Google, install `LiquidApplication.OnGoogle`
+- If you'll deploy your application to AWS, install `LiquidApplication.OnAWS`
 
 # Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+Some of the best ways to contribute are to try things out, file issues, and make pull-requests.
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://www.visualstudio.com/en-us/docs/git/create-a-readme). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+- You can provide feedback by filing issues on GitHub. We accept issues, ideas and questions. 
+- You can contribute by creating pull requests for the issues that are listed. Look for issues marked as _good first issue_ if you are new to the project.
+
+In any case, be sure to take a look at [the contributing guide](CONTRIBUTING.md) before starting.
