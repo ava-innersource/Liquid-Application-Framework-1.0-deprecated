@@ -21,4 +21,4 @@ jobs:
     - name: Pack the nugets
       run: dotnet pack --configuration Release
     - name: Publish the nugets
-      run: for i in `find . -name LiquidApplication.*.nupkg`; do dotnet nuget push $i -k $NugetApiKey -s https://api.nuget.org/v3/index.json; done
+      run: for i in `find | grep '.nupkg'`; do dotnet nuget push $i -k $NugetApiKey -s https://api.nuget.org/v3/index.json; done
