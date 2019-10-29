@@ -69,7 +69,7 @@ namespace Liquid.Activation
         {
             response.PayLoad = (response.ViewModelData != null) ? response.ViewModelData.ToJsonCamelCase() : null;
 
-            if (Logger.EnabledLogTrafic)
+            if (Logger?.EnabledLogTrafic == true)
             {
                 Logger.Info("Router: " + HttpContext.Request.Path + " \n Response: " + response.ToStringCamelCase());
             }
