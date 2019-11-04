@@ -16,11 +16,8 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="API\LightAPI.cs~RF6ca3c19.TMP" />
-    <None Remove="Command\LightCommandHandler.cs~RF5019b10.TMP" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.1.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Liquid.Base\Liquid.Base.csproj" />
