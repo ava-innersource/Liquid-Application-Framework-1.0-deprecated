@@ -21,6 +21,9 @@
     <None Remove="ServiceBus\**" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.3" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Liquid.Base\Liquid.Base.csproj" />
     <ProjectReference Include="..\Liquid.Domain\Liquid.Domain.csproj" />
   </ItemGroup>

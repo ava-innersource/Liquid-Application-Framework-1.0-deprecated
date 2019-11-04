@@ -18,6 +18,7 @@
     <PackageReference Include="Google.Cloud.Monitoring.V3" Version="1.1.0" />
     <PackageReference Include="Google.Cloud.PubSub.V1" Version="1.0.0" />
     <PackageReference Include="Google.Cloud.Storage.V1" Version="2.3.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Liquid.Base\Liquid.Base.csproj" />
