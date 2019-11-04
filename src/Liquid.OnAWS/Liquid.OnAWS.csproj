@@ -21,6 +21,7 @@
     <PackageReference Include="AWSSDK.SQS" Version="3.3.102.9" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Analyzers" Version="2.2.0" />
     <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.6.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Liquid.Base\Liquid.Base.csproj" />
