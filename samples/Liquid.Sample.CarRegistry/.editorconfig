@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.CA2007.severity = none # no need to use ConfigureAwait since it's not GUI code
