@@ -10,7 +10,6 @@
     <Copyright>Avanade Inc.</Copyright>
     <Description>Main abstractions for building Liquid Microservices.</Description>
     <Authors>Avanade Brazil Architect Team - Gustavo Denis; Leonardo Machado; Andersson Pinheiro; Paulo Araujo</Authors>
-    <PackageId>Liquid.Base</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
