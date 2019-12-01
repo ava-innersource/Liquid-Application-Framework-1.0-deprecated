@@ -57,51 +57,37 @@ namespace Liquid
 
         public static void UseMediaStorage<T>() where T : ILightMediaStorage, new()
         {
-            ValidateInterfaces<T>(nameof(ILightMediaStorage));
             AddToCache(WorkBenchServiceType.MediaStorage, new T());
         }
 
         public static void UseRepository<T>() where T : ILightRepository, new()
         {
-            ValidateInterfaces<T>(nameof(ILightRepository));
             AddToCache(WorkBenchServiceType.Repository, new T());
         }
 
         public static void UseMessageBus<T>() where T : ILightWorker, new()
         {
-            ValidateInterfaces<T>(nameof(ILightWorker));
             AddToCache(WorkBenchServiceType.Worker, new T());
         }
 
         public static void UseTelemetry<T>() where T : ILightTelemetry, new()
         {
-            ValidateInterfaces<T>(nameof(ILightTelemetry));
             AddToCache(WorkBenchServiceType.Telemetry, new T());
         }
 
         public static void UseEnventHandler<T>() where T : ILightEvent, new()
         {
-            ValidateInterfaces<T>(nameof(ILightEvent));
             AddToCache(WorkBenchServiceType.EventHandler, new T());
         }
 
         public static void UseCache<T>() where T : ILightCache, new()
         {
-            ValidateInterfaces<T>(nameof(ILightCache));
             AddToCache(WorkBenchServiceType.Cache, new T());
         }
 
         public static void UseLogger<T>() where T : ILightLogger, new()
         {
-            ValidateInterfaces<T>(nameof(ILightLogger));
             AddToCache(WorkBenchServiceType.Logger, new T());
-        }
-
-        private static void ValidateInterfaces<T>(string interfaceName) where T : new()
-        {
-            //Checks the type as string so as to avoid circular dependecy between workbench and its services
-            if (typeof(T).GetInterface(interfaceName) == null)
-                throw new ArgumentException("type", $"The '{typeof(T)}' is not a '{interfaceName}'.");
         }
 
         public static object GetRegisteredService(WorkBenchServiceType serviceType)
