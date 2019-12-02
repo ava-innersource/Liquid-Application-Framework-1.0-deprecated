@@ -17,6 +17,7 @@ namespace Liquid.Runtime.Polly
             PollyConfiguration pollyConfig = (PollyConfiguration)pollyconfiguration;
             AsyncRetryPolicy<HttpResponseMessage> retryPolicy = null;
 
+            // TODO: Please let's remove this ternary
             retryPolicy = pollyConfig.IsBackOff == true ? Policy.HandleResult<HttpResponseMessage>(r => r.StatusCode.Equals(HttpStatusCode.InternalServerError))
                 .Or<WebException>().Or<HttpRequestException>()
                     .WaitAndRetryAsync(pollyConfig.Retry, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (result, timeSpan, retryCount, context) =>

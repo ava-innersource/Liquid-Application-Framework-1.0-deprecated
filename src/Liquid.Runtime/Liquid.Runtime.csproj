@@ -29,6 +29,7 @@
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.8.5" />
     <PackageReference Include="Polly" Version="7.1.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="4.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Liquid.Base\Liquid.Base.csproj" />

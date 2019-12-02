@@ -136,6 +136,8 @@ namespace Liquid.Runtime
                 {
                     {"Bearer",new string[]{}}
                 });
+                
+                c.EnableAnnotations();
             });
         }
 

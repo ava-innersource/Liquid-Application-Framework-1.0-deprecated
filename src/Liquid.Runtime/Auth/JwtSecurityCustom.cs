@@ -21,8 +21,10 @@ namespace Liquid.Runtime
             ClaimsIdentity claims = null;
             ClaimsIdentity mockClaims = null;
             JwtSecurityToken jwt;
+			// TODO: This is way too much specialized and must be reworked
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production" &&
-                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Quality")
+                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Quality" &&
+                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Integration")
             {
                 mockClaims = new ClaimsIdentity(new[] {
                         new Claim(ClaimTypes.Email, "amaw@amaw.com.br"),
