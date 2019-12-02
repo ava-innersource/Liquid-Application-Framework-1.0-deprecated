@@ -9,10 +9,10 @@ namespace Liquid.Interfaces
     /// </summary>
     public interface ILightMediaStorage : IWorkBenchHealthCheck
     {	
-		String Conection { get; set; }
-        String Container { get; set; }
+		string Conection { get; set; }
+        string Container { get; set; }
         Task<ILightAttachment> GetAsync(string resourceId, string id);
-        void InsertUpdateAsync(ILightAttachment attachment); 
-        void Remove(ILightAttachment attachment); 
+        Task InsertUpdateAsync(ILightAttachment attachment); 
+        Task Remove(ILightAttachment attachment); 
     }
 }

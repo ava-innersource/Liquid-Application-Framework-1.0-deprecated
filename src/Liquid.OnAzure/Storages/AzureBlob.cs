@@ -1,4 +1,4 @@
-﻿using Liquid.Interfaces;
+using Liquid.Interfaces;
 using Liquid.Repository;
 using Liquid.Runtime.Configuration.Base;
 using Microsoft.WindowsAzure.Storage; // Namespace for CloudStorageAccount  
@@ -67,7 +67,7 @@ namespace Liquid.OnAzure
 
         public async Task<ILightAttachment> GetAsync(string resourceId, string id)
         {
-            var blob = _containerReference.GetBlobReference(id);
+            var blob = _containerReference.GetBlobReference(resourceId + "/" + id);
             Stream stream = new MemoryStream();
             await blob.DownloadToStreamAsync(stream);
             LightAttachment _blob = new LightAttachment()
@@ -96,7 +96,7 @@ namespace Liquid.OnAzure
             }
         }
 
-        public async void InsertUpdateAsync(ILightAttachment attachment)
+        public async Task InsertUpdateAsync(ILightAttachment attachment)
         {
             var targetFile = attachment.Id;
             var blockBlob = _containerReference.GetDirectoryReference(attachment.ResourceId).GetBlockBlobReference(targetFile);
@@ -106,11 +106,11 @@ namespace Liquid.OnAzure
 
         }
 
-        public void Remove(ILightAttachment attachment)
+        public Task Remove(ILightAttachment attachment)
         {
             var targetFile = attachment.Id;
             var blockBlob = _containerReference.GetDirectoryReference(attachment.ResourceId).GetBlockBlobReference(targetFile);
-            blockBlob.DeleteIfExistsAsync();
+            return blockBlob.DeleteIfExistsAsync();
         }
 
         /// <summary>

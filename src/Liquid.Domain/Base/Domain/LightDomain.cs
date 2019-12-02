@@ -9,7 +9,13 @@ namespace Liquid.Base.Domain
     /// </summary>
     public abstract class LightDomain : ILightDomain
     {
+
+        // TODO: StatusCode, BadRequest and GenericReturn were added by an Avanade internal project. We must investigate their real need
+
+        protected int? StatusCode { get; set; }
         protected bool HasNotFoundError { get; set; }
+        protected bool HasNotGenericReturn { get; set; }
+        protected bool HasBadRequestError { get; set; }
         protected ILightRepository Repository => WorkBench.Repository;
         protected ILightMediaStorage MediaStorage => WorkBench.MediaStorage;
         public ILightTelemetry Telemetry { get; set; }
@@ -19,11 +25,24 @@ namespace Liquid.Base.Domain
         protected bool HasBusinessErrors => _criticHandler != null && _criticHandler.HasBusinessErrors;
         private ICriticHandler _criticHandler { get; set; }
         public ICriticHandler CritictHandler { get { return _criticHandler; } set { _criticHandler = value; } }
-
         internal abstract void ExternalInheritanceNotAllowed();
 
-
-
+        /// <summary>
+        /// Add to the scope that some generic return message and status code
+        /// </summary>
+        protected void AddGenericReturn(StatusCodes statusCode)
+        {
+            HasNotGenericReturn = true;
+            StatusCode = (int)statusCode;
+        }
+        /// <summary>
+        /// Add to the scope that some generic return message and status code
+        /// </summary>
+        protected void AddGenericReturn(string errorCode, StatusCodes statusCode)
+        {
+            AddGenericReturn(statusCode);
+            AddBusinessError(errorCode);
+        }
         /// <summary>
         /// Add to the scope that some critic has a not found type of error
         /// </summary>
@@ -40,7 +59,25 @@ namespace Liquid.Base.Domain
             AddNotFound();
             AddBusinessError(errorCode);
         }
-
+		
+        /// <summary>
+        /// Add to the scope that some critic has a bad request type of error
+        /// </summary>
+        protected void AddBadRequest()
+        {
+            HasBadRequestError = true;
+        }
+		
+        /// <summary>
+        /// Add to the scope that some critic has a bad request type of error
+        /// <param name="errorCode">error code of the message</param>
+        /// </summary>
+        protected void AddBadRequest(string errorCode)
+        {
+            AddBadRequest();
+            AddBusinessError(errorCode);
+        }
+		
         /// <summary>
         /// Method add the error code to the CriticHandler
         /// and add in Critics list to build the object InvalidInputException
@@ -112,11 +149,13 @@ namespace Liquid.Base.Domain
             response.Critics = (_criticHandler != null) ? _criticHandler.Critics.ToJsonCamelCase() : null;
             response.ModelData = data;
             response.NotFoundMessage = HasNotFoundError;
+            response.BadRequestMessage = HasBadRequestError;
+            response.GenericReturnMessage = HasNotGenericReturn;
+            response.StatusCode = StatusCode;
+            response.OperationId = System.Diagnostics.Activity.Current?.RootId;
             return response;
         }
-
-
-
+ 
         /// <summary>
         /// Returns a  instance of a LightDomain class for calling business domain logic
         /// </summary>
@@ -127,7 +166,5 @@ namespace Liquid.Base.Domain
             ILightDomain service = (ILightDomain)new T();
             return (T)service;
         }
-
-
     }
 }
