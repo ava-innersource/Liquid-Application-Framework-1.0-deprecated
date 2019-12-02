@@ -1,4 +1,4 @@
-using Liquid.Interfaces;
+﻿using Liquid.Interfaces;
 using Liquid.Repository;
 using Liquid.Runtime.Configuration.Base;
 using Microsoft.WindowsAzure.Storage; // Namespace for CloudStorageAccount  
@@ -68,6 +68,14 @@ namespace Liquid.OnAzure
         public async Task<ILightAttachment> GetAsync(string resourceId, string id)
         {
             var blob = _containerReference.GetBlobReference(resourceId + "/" + id);
+
+            string sas = string.Empty;
+
+            if (mediaStorageConfiguration.Permission == "Off")
+            {
+                sas = GetSharedAccessSignature(blob);
+            }
+
             Stream stream = new MemoryStream();
             await blob.DownloadToStreamAsync(stream);
             LightAttachment _blob = new LightAttachment()
@@ -77,9 +85,21 @@ namespace Liquid.OnAzure
                 ResourceId = resourceId,
                 ContentType = blob.Properties.ContentType,
                 Name = blob.Name,
-                MediaLink = blob.Uri.AbsoluteUri
+                MediaLink = blob.Uri.AbsoluteUri + sas
             };
             return _blob;
+        }
+
+        private string GetSharedAccessSignature(CloudBlob blob)
+        {
+            var policy = new SharedAccessBlobPolicy
+            {
+                SharedAccessStartTime = DateTime.Now,
+                SharedAccessExpiryTime = DateTime.UtcNow.AddDays(mediaStorageConfiguration.SasDays),
+                Permissions = SharedAccessBlobPermissions.Read,
+            };
+
+            return blob.GetSharedAccessSignature(policy);
         }
 
         private byte[] ReadFully(Stream input, int size)
@@ -103,7 +123,6 @@ namespace Liquid.OnAzure
             blockBlob.Properties.ContentType = attachment.ContentType;
             await blockBlob.UploadFromByteArrayAsync(ReadFully(attachment.MediaStream, blockBlob.StreamWriteSizeInBytes),
                             0, (int)attachment.MediaStream.Length);
-
         }
 
         public Task Remove(ILightAttachment attachment)
@@ -135,3 +154,4 @@ namespace Liquid.OnAzure
         }
     }
 }
+

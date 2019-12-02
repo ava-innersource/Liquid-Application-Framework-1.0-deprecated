@@ -8,8 +8,9 @@ namespace Liquid.Repository
         public string ConnectionString { get; set; }
         public string Container { get; set; }
 		public string Permission { get; set; }
+        public double SasDays { get; set; }
 
-		public override void Validate()
+        public override void Validate()
         {
             RuleFor(d => ConnectionString).NotEmpty().WithMessage("'ConnectionString' on MediaStorage settings should not be empty.");
 
