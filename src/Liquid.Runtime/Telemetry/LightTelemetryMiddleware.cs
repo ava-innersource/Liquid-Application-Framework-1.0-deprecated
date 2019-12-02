@@ -8,26 +8,36 @@ using System.Linq;
 namespace Liquid.Runtime.Telemetry
 {
     /// <summary>
-    /// Cria uma extensão para o middleware
+    /// Add some methods to configure Telemetry providers.
     /// </summary>
     public static class TelemetryExtensions
     {
         /// <summary>
-        /// Enable Application Insight Telemetry
+        /// Enable Application Insights telemetry
         /// </summary>
-        /// <param name="services"></param>
+        /// <param name="services">Collection of services that the telemetry will be added to</param>
+        /// <remarks>
+        /// Only works if the configuration file contains a section named 'ApplicationInsights'.
+        /// Will also add the KubernetesEnricher if the section contains a key EnableKubernetes with 
+        /// value 'true'.
+        /// </remarks>
         public static void AddTelemetry(IServiceCollection services)
         {
-            if (WorkBench.Configuration.GetSection("ApplicationInsights") != null)
+            // TODO: use typed configuration
+            var applicationInsightsSection = WorkBench.Configuration.GetSection("ApplicationInsights");
+
+            if (applicationInsightsSection == null) return;
+
+            services.AddApplicationInsightsTelemetry();
+
+            var configs = applicationInsightsSection.GetChildren().ToList();
+
+            var k8sEnabled = configs.FirstOrDefault(p => RelaxedEqual(p.Key.Trim(), "EnableKubernetes"));
+            if (k8sEnabled == null) return;
+
+            if (RelaxedEqual(k8sEnabled.Value, "true"))
             {
-                services
-                .AddApplicationInsightsTelemetry();
-                var configs = WorkBench.Configuration.GetSection("ApplicationInsights").GetChildren().ToList();
-                var k8senabled = configs.FirstOrDefault(p => p.Key == "EnableKubernetes");
-                if (k8senabled.Value.ToLower() == "true")
-                {
-                    services.AddApplicationInsightsKubernetesEnricher();
-                }
+                services.AddApplicationInsightsKubernetesEnricher();
             }
         }
 
@@ -41,6 +51,20 @@ namespace Liquid.Runtime.Telemetry
         {
             return builder
                 .UseMiddleware<TelemetryMiddleware>();
+        }
+
+        /// <summary>
+        /// Checks if the value of both strings are the same, in a relaxed way
+        /// </summary>
+        /// <param name="value">The value of the original string</param>
+        /// <param name="expected">The value that the string will be compared to</param>
+        /// <returns>True if both strings are equal</returns>
+        /// <remarks>
+        /// This method ignores casing and whitespace to enable a more relaxed comparison.
+        /// </remarks>
+        private static bool RelaxedEqual(string value, string expected)
+        {
+            return string.Compare(value.Trim(), expected, StringComparison.OrdinalIgnoreCase) == 0;
         }
     }
 

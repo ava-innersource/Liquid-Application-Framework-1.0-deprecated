@@ -1,4 +1,4 @@
-# Enter Liquid ![CI Badge](https://github.com/Avanade/Liquid-Application-Framework/workflows/ASP.NET%20Core%20CI/badge.svg)
+# Enter Liquid ![CI Badge](https://github.com/Avanade/Liquid-Application-Framework/workflows/CI/badge.svg)
 Liquid is a **multi-cloud** framework designed to **accelerate the development** of cloud-native microservices while avoiding coupling your code to specific cloud providers. 
 
 When writing Liquid applications, you stop worrying about the technology and focus on your business - Liquid abstracts most of the boilerplate and let you just write domain code that looks great and gets the job done.
