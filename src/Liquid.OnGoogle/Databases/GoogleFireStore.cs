@@ -179,8 +179,8 @@ namespace Liquid.OnGoogle
         /// <param name="mediaStorage"></param>
         public override void SetMediaStorage(ILightMediaStorage mediaStorage)
         {
-			_mediaStorage = mediaStorage;
-        }     
+            _mediaStorage = mediaStorage;
+        }
 
         /// <summary>
         /// Get or create a Database on Google FireStore
@@ -291,7 +291,7 @@ namespace Liquid.OnGoogle
             QuerySnapshot ret = await qry.GetSnapshotAsync();
             foreach (var item in ret.Documents)
             {
-                list.Add(HydrateEntity<T>(item));  
+                list.Add(HydrateEntity<T>(item));
             }
 
             LightPaging<T> result = new LightPaging<T>()
@@ -517,9 +517,9 @@ namespace Liquid.OnGoogle
         /// </summary>
         /// <param name="entityId"> id of the document</param>
         /// <param name="fileName">id of the attachment</param>
-        public override async Task DeleteAttachmentAsync<T>(string entityId, string fileName)
+        public override Task DeleteAttachmentAsync<T>(string entityId, string fileName)
         {
-            _mediaStorage.Remove(GetLightAttachment(entityId, fileName, null));
+            return _mediaStorage.Remove(GetLightAttachment(entityId, fileName, null));
         }
 
         /// <summary>
@@ -530,14 +530,14 @@ namespace Liquid.OnGoogle
         /// <returns></returns>
         public override async Task DeleteAsync<T>(string entityId)
         {
-            await base.DeleteAsync<T>(entityId);
-
             Query qry = _collection.WhereEqualTo("Id", entityId);
             QuerySnapshot ret = await qry.GetSnapshotAsync();
             foreach (DocumentSnapshot document in ret.Documents)
             {
                 await document.Reference.DeleteAsync();
             }
+
+            await base.DeleteAsync<T>(entityId);
         }
 
         /// <summary>
@@ -692,7 +692,7 @@ namespace Liquid.OnGoogle
             catch
             {
                 return LightHealth.HealthCheck.Unhealthy;
-            }            
+            }
         }
     }
 }

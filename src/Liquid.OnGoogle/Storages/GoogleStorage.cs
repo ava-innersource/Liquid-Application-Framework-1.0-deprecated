@@ -10,12 +10,12 @@ namespace Liquid.OnGoogle
 {
     public class GoogleStorage : ILightMediaStorage
     {
-		public int MyProperty { get; set; }
-		public string Conection { get; set; } // projectID
+        public int MyProperty { get; set; }
+        public string Conection { get; set; } // projectID
         public string Container { get; set; } // bucketName
-		public dynamic mediaStorageConfiguration { get; set; }
+        public dynamic mediaStorageConfiguration { get; set; }
 
-		private StorageClient _client = null;
+        private StorageClient _client = null;
         private Bucket _bucket = null;
 
         public void Initialize()
@@ -43,14 +43,16 @@ namespace Liquid.OnGoogle
             return _blob;
         }
 
-        public async void InsertUpdateAsync(ILightAttachment attachment)
+        public Task InsertUpdateAsync(ILightAttachment attachment)
         {
-            await _client.UploadObjectAsync(this.Container, attachment.ResourceId + "/" + attachment.Name, attachment.ContentType, attachment.MediaStream);
+            return _client.UploadObjectAsync(this.Container, attachment.ResourceId + "/" + attachment.Name, attachment.ContentType, attachment.MediaStream);
         }
 
-        public void Remove(ILightAttachment attachment)
+        public Task Remove(ILightAttachment attachment)
         {
             _client.DeleteObject(this.Container, attachment.ResourceId + "/" + attachment.Id);
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -65,10 +67,11 @@ namespace Liquid.OnGoogle
             {
                 var bucket = _client.ListBuckets(this._bucket.ProjectNumber.ToString());
                 return LightHealth.HealthCheck.Healthy;
-            }catch 
+            }
+            catch
             {
                 return LightHealth.HealthCheck.Unhealthy;
-            }                
+            }
         }
 
     }
