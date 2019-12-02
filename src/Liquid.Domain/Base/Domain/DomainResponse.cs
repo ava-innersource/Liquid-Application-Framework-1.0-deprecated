@@ -1,7 +1,5 @@
-﻿using Liquid.Interfaces;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 
 namespace Liquid.Base.Domain
 {
@@ -25,7 +23,7 @@ namespace Liquid.Base.Domain
         /// <summary>
         /// Response data serialized support (bytes, JSON, XML and etc.)
         /// </summary>
-        public JToken PayLoad { get; set; }
+        public virtual JToken PayLoad { get; set; }
 
         /// <summary>
         /// Business critics produced by domain business logic
@@ -33,9 +31,34 @@ namespace Liquid.Base.Domain
         public JToken Critics { get; set; }
 
         /// <summary>
+        /// Identifies the current operation
+        /// </summary>
+        public string OperationId { get; set; }
+		
+        /// <summary>
         /// When true indicate that some critics have a not found message
         /// </summary>
         [JsonIgnore]
         public bool NotFoundMessage { get; set; }
+
+        // TODO: All properties below were added by a specific project, and I must check wether they make sense
+        
+        /// <summary>
+        /// When true indicate that some critics have a bad request message
+        /// </summary>
+        [JsonIgnore]
+        public bool BadRequestMessage { get; set; }
+
+        /// <summary>
+        /// When true indicate that have some generic return message
+        /// </summary>
+        [JsonIgnore]
+        public bool GenericReturnMessage { get; set; }
+        
+        /// <summary>
+        /// Response status code for generic return
+        /// </summary>
+        [JsonIgnore]        
+        public int? StatusCode { get; set; }
     }
 }

@@ -36,6 +36,34 @@ namespace Liquid.Runtime
         public static void AddAuth(this IServiceCollection services, bool hasIdentityServer)
         {
             config = LightConfigurator.Config<AuthConfiguration>("Auth");
+
+            SecurityKey key = null;
+            if (config.Credentials)
+                key = AddSecurityKey();
+            
+
+            if (!hasIdentityServer)
+            {
+                services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(jwtOpt =>
+                {
+                    jwtOpt.Authority = config.Authority;
+                    jwtOpt.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = config.Issuer,
+                        ValidateAudience = true,
+                        ValidAudiences = config.Audiencies.Split(','),
+                        IssuerSigningKey = key
+                    };
+                    jwtOpt.Events = new JwtBearerEvents();
+                    jwtOpt.RequireHttpsMetadata = config.RequireHttpsMetadata;
+                });
+            }
+
+        }
+
+        public static SecurityKey AddSecurityKey()
+        {
             var rsaConfig = LightConfigurator.Config<SigningCredentialsConfig>("SigningCredentials");
 
             RSAParameters rsaParameters = new RSAParameters
@@ -52,24 +80,7 @@ namespace Liquid.Runtime
             SecurityKey key = new RsaSecurityKey(rsaParameters);
             key.KeyId = rsaConfig.KeyId;
 
-            if (!hasIdentityServer)
-            {
-                services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(jwtOpt =>
-                {
-                    jwtOpt.Authority = config.Authority;
-                    jwtOpt.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidIssuer = config.Authority,
-                        ValidateAudience = true,
-                        ValidAudiences = config.Audiencies.Split(','),
-                        IssuerSigningKey = key
-                    };
-                    jwtOpt.Events = new JwtBearerEvents();
-                    jwtOpt.RequireHttpsMetadata = config.RequireHttpsMetadata;
-                });
-            }
-
+            return key;
         }
     }
 
@@ -96,8 +107,10 @@ namespace Liquid.Runtime
         /// <returns></returns>
         public async Task Invoke(HttpContext context)
         { 
+		    // TODO: This is way too much specialized, we must review it ASAP
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production" &&
-                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Quality")
+                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Quality" &&
+                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Integration")
             {
                 string token = string.Empty;
                 bool tokenMustValidated = false;

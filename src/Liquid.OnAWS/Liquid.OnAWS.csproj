@@ -12,13 +12,13 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AWSSDK.CloudWatch" Version="3.3.102.32" />
-    <PackageReference Include="AWSSDK.CloudWatchEvents" Version="3.3.101.31" />
-    <PackageReference Include="AWSSDK.Core" Version="3.3.103.41" />
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.101.68" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.104.29" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.66" />
-    <PackageReference Include="AWSSDK.SQS" Version="3.3.102.9" />
+    <PackageReference Include="AWSSDK.CloudWatch" Version="3.3.7" />
+    <PackageReference Include="AWSSDK.CloudWatchEvents" Version="3.3.6.3" />
+    <PackageReference Include="AWSSDK.Core" Version="3.3.25.3" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.14.2" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.23.2" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.1.11" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.3.3.19" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Analyzers" Version="2.2.0" />
     <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.6.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.3" />

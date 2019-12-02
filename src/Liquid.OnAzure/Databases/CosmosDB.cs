@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -26,8 +27,8 @@ namespace Liquid.OnAzure
     {
         private static DocumentClient _client;
         private LightLazy<Database> _database;
-        private LightLazy<DocumentCollection> _collection;
         private string _databaseId;
+        // BUG: This is reminiscent of the old, non thread-safe implementation. We must remove it.
         private string _collectionName;
         private readonly string _suffixName;
         private string _endpoint;
@@ -35,7 +36,11 @@ namespace Liquid.OnAzure
         private ConnectionPolicy _connPolicy;
         private ILightMediaStorage _mediaStorage;
         private CosmosDBConfiguration config;
-        private readonly IDictionary<Type, LightLazy<DocumentCollection>> _collectionsRegistred = new Dictionary<Type, LightLazy<DocumentCollection>>();
+
+        /// <summary>
+        /// Holds the collection were a type will be stored
+        /// </summary>
+        private readonly ConcurrentDictionary<Type, LightLazy<DocumentCollection>> _typeToCollectionMap = new ConcurrentDictionary<Type, LightLazy<DocumentCollection>>();
 
         /// <summary>
         /// Creates a CosmosDB instance from default settings provided on appsettings.
@@ -94,7 +99,6 @@ namespace Liquid.OnAzure
             _databaseId = this.config.DatabaseId;
             _client = GetConnection();
             _database = new LightLazy<Database>(async () => await GetOrCreateDatabaseAsync());
-            _collection = new LightLazy<DocumentCollection>(async () => await GetOrCreateCollectionAsync());
         }
 
         /// <summary>
@@ -238,9 +242,11 @@ namespace Liquid.OnAzure
 
             DocumentResponse<Document> DocResp = null;
 
+            _typeToCollectionMap.TryGetValue(typeof(T), out var collection);
+
             try
             {
-                DocResp = _client.ReadDocumentAsync<Document>(UriFactory.CreateDocumentUri(_databaseId, (await _collection).Id, entityId), new RequestOptions() { PartitionKey = new PartitionKey(Undefined.Value) }).Result;
+                DocResp = _client.ReadDocumentAsync<Document>(UriFactory.CreateDocumentUri(_databaseId, (await collection).Id, entityId), new RequestOptions() { PartitionKey = new PartitionKey(Undefined.Value) }).Result;
             }
             catch (AggregateException ae)
             {
@@ -278,6 +284,8 @@ namespace Liquid.OnAzure
         {
             await base.AddOrUpdateAsync(model);
 
+            _typeToCollectionMap.TryGetValue(typeof(T), out var _collection);
+
             T upsertedEntity;
             var upsertedDoc = await _client.UpsertDocumentAsync((await _collection).SelfLink, model, options: (RequestOptions)AccessConditionOptimistic(model));
             upsertedEntity = JsonConvert.DeserializeObject<T>(upsertedDoc.Resource.ToString());
@@ -301,6 +309,8 @@ namespace Liquid.OnAzure
         public override async Task<IEnumerable<T>> AddOrUpdateAsync<T>(List<T> listModels)
         {
             List<T> errorEntities = new List<T>();
+
+            _typeToCollectionMap.TryGetValue(typeof(T), out var _collection);
 
             foreach (var model in listModels)
             {
@@ -400,19 +410,23 @@ namespace Liquid.OnAzure
         {
             await base.AddOrUpdateAttachmentAsync<T>(entityId, fileName, attachment); //Calls the base class because there may be some generic behavior in it
 
+            _typeToCollectionMap.TryGetValue(typeof(T), out var collection);
+
             Document doc = await GetByIdAsync<Document>(entityId);
             ILightAttachment upserted = GetLightAttachment(entityId, fileName, attachment);
             Attachment attachmentDB = GetAttachment(upserted);
+
             if (_mediaStorage != null)
             {
                 attachmentDB.MediaLink = null;
-                await _client.UpsertAttachmentAsync(doc.SelfLink, attachmentDB);
-                _mediaStorage.InsertUpdateAsync(upserted);
+                await _client.UpsertAttachmentAsync(doc.SelfLink, attachmentDB, new RequestOptions() { PartitionKey = new PartitionKey(Undefined.Value) });
+                await _mediaStorage.InsertUpdateAsync(upserted);                       
             }
             else
             {
                 await _client.UpsertAttachmentAsync(doc.SelfLink, attachmentDB);
             }
+
             return upserted;
         }
 
@@ -426,6 +440,8 @@ namespace Liquid.OnAzure
         public override async Task<ILightAttachment> GetAttachmentAsync<T>(string entityId, string fileName)
         {
             await base.GetAttachmentAsync<T>(entityId, fileName);
+
+            _typeToCollectionMap.TryGetValue(typeof(T), out var _collection);
 
             ILightAttachment lightAttachment;
             if (_mediaStorage != null)
@@ -484,6 +500,9 @@ namespace Liquid.OnAzure
         public override async Task<int> CountAsync<T>()
         {
             await base.CountAsync<T>();
+
+            _typeToCollectionMap.TryGetValue(typeof(T), out var _collection);
+
             FeedOptions options = new FeedOptions { EnableCrossPartitionQuery = true, PartitionKey = new PartitionKey(Undefined.Value) };
 
             return _client.CreateDocumentQuery<T>((await _collection).SelfLink, options).Count();
@@ -500,6 +519,7 @@ namespace Liquid.OnAzure
         {
             await base.CountAsync<T>(predicate); //Calls the base class because there may be some generic behavior in it
             FeedOptions options = new FeedOptions { EnableCrossPartitionQuery = true, PartitionKey = new PartitionKey(Undefined.Value) };
+            _typeToCollectionMap.TryGetValue(typeof(T), out var _collection);
 
             return _client.CreateDocumentQuery<T>((await _collection).SelfLink, options).Where(predicate).Count();
         }
@@ -513,7 +533,7 @@ namespace Liquid.OnAzure
         public override async Task DeleteAttachmentAsync<T>(string entityId, string fileName)
         {
             await base.DeleteAttachmentAsync<T>(entityId, fileName);
-            Attachment attachment = (Attachment)await _client.ReadAttachmentAsync(GetAttachmentUri(entityId, fileName));
+            Attachment attachment = _client.ReadAttachmentAsync(GetAttachmentUri(entityId, fileName)).Result;
             if (attachment != null)
             {
                 await _client.DeleteAttachmentAsync(GetAttachmentUri(entityId, fileName));
@@ -539,9 +559,11 @@ namespace Liquid.OnAzure
         {
             await base.DeleteAsync<T>(entityId);
 
+            _typeToCollectionMap.TryGetValue(typeof(T), out var collection);
             try
             {
-                var doc = _client.ReadDocumentAsync<Document>(UriFactory.CreateDocumentUri(_databaseId, (await _collection).Id, entityId), new RequestOptions() { PartitionKey = new PartitionKey(Undefined.Value) }).Result;
+                var uri = UriFactory.CreateDocumentUri(_databaseId, (await collection).Id, entityId);
+                var doc = _client.ReadDocumentAsync<Document>(uri, new RequestOptions() { PartitionKey = new PartitionKey(Undefined.Value) }).Result;
 
                 if (doc != null)
                 {
@@ -585,6 +607,8 @@ namespace Liquid.OnAzure
         {
             await base.GetAsync<T>(predicate);
 
+            _typeToCollectionMap.TryGetValue(typeof(T), out var _collection);
+
             FeedOptions options = new FeedOptions { EnableCrossPartitionQuery = true };
 
             return _client.CreateDocumentQuery<T>((await _collection).SelfLink, options).Where(predicate).AsQueryable();
@@ -601,6 +625,8 @@ namespace Liquid.OnAzure
         public override async Task<ILightPaging<T>> GetByPageAsync<T>(string token, Expression<Func<T, bool>> filter, int page, int itemsPerPage)
         {
             await base.GetByPageAsync<T>(token, filter, page, itemsPerPage); //Calls the base class because there may be some generic behavior in it
+
+            _typeToCollectionMap.TryGetValue(typeof(T), out var _collection);
 
             List<T> list = new List<T>();
             string continuationToken = null;
@@ -645,6 +671,8 @@ namespace Liquid.OnAzure
         public override async Task<ILightPaging<T>> GetByPageAsync<T>(Expression<Func<T, bool>> filter, int page, int itemsPerPage)
         {
             await base.GetByPageAsync<T>(filter, page, itemsPerPage); //Calls the base class because there may be some generic behavior in it
+
+            _typeToCollectionMap.TryGetValue(typeof(T), out var _collection);
 
             List<T> list = new List<T>();
             string continuationToken = null;
@@ -691,6 +719,8 @@ namespace Liquid.OnAzure
         {
             await base.QueryAsyncJson<T>(query);
 
+            _typeToCollectionMap.TryGetValue(typeof(T), out var _collection);
+
             var ret = _client.CreateDocumentQuery((await _collection).SelfLink, query).AsQueryable();
             return JObject.Parse(JsonConvert.SerializeObject(ret.ToArray()));
         }
@@ -706,6 +736,8 @@ namespace Liquid.OnAzure
         {
             await base.QueryAsync<T>(query);
             FeedOptions options = new FeedOptions { EnableCrossPartitionQuery = true };
+
+            _typeToCollectionMap.TryGetValue(typeof(T), out var _collection);
 
             return _client.CreateDocumentQuery<T>((await _collection).SelfLink, query, options).AsQueryable();
 
@@ -751,7 +783,6 @@ namespace Liquid.OnAzure
             }
             return new RequestOptions() { AccessCondition = new AccessCondition() { Type = AccessConditionType.IfNoneMatch } };
         }
-
 
         /// <summary>
         /// Get Azure Cosmos DB Connection
@@ -810,20 +841,18 @@ namespace Liquid.OnAzure
         /// <param name="T"></param>
         private void InjectTarget(Type T)
         {
-            this._collectionsRegistred.TryGetValue(T, out LightLazy<DocumentCollection> documentColletionRuntime);
+            this._typeToCollectionMap.TryGetValue(T, out LightLazy<DocumentCollection> documentColletionRuntime);
 
             if (documentColletionRuntime == null)
             {
                 _collectionName = T.Name;
-                _collection = new LightLazy<DocumentCollection>(async () => await GetOrCreateCollectionAsync());
-
-                this._collectionsRegistred.Add(T, _collection);
+                var _collection = new LightLazy<DocumentCollection>(async () => await GetOrCreateCollectionAsync());
+                
+                this._typeToCollectionMap.TryAdd(T, _collection);
             }
             else
-            {
                 _collectionName = T.Name;
-                _collection = documentColletionRuntime;
-            }
+
         }
 
         /// <summary>

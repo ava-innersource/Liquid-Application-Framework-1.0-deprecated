@@ -48,19 +48,20 @@ namespace Liquid.OnAWS
             return _blob;
         }
 
-        public async void InsertUpdateAsync(ILightAttachment attachment)
+        public Task InsertUpdateAsync(ILightAttachment attachment)
         {
-            await _fileTransferUtility.UploadAsync(attachment.MediaStream, Container, attachment.ResourceId + "/" + attachment.Id);
+            return _fileTransferUtility.UploadAsync(attachment.MediaStream, Container, attachment.ResourceId + "/" + attachment.Id);
         }
 
-        public void Remove(ILightAttachment attachment)
+        public Task Remove(ILightAttachment attachment)
         {
             DeleteObjectRequest deleteObject = new DeleteObjectRequest
             {
                 BucketName = Container,
                 Key = attachment.ResourceId + "/" + attachment.Id
             };
-            _client.DeleteObjectAsync(deleteObject);
+            
+            return _client.DeleteObjectAsync(deleteObject);
         }
 
         /// <summary>
