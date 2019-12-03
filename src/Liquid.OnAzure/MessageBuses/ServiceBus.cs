@@ -5,6 +5,7 @@ using Liquid.Activation;
 using Liquid.Runtime.Configuration.Base;
 using Liquid.Runtime.Telemetry;
 using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.Management;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -51,7 +52,6 @@ namespace Liquid.OnAzure
             return config.ConnectionString;
         }
 
-
         /// <summary>
         /// If  an error occurs in the processing, this method going to called
         /// </summary>
@@ -62,6 +62,30 @@ namespace Liquid.OnAzure
             //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
             ((LightTelemetry)WorkBench.Telemetry).TrackException(exceptionReceivedEventArgs.Exception);
             return Task.CompletedTask;
+        }
+		
+        /// <summary>
+        /// Create queue if not exists
+        /// </summary>
+        /// <param name="queue"></param>
+        /// <returns></returns>
+        private async Task<QueueClient> GetOrCreateQueueAsync(KeyValuePair<MethodInfo, QueueAttribute> queue)
+        {
+            ReceiveMode receiveMode = (queue.Value.DeleteAfterRead) ? ReceiveMode.ReceiveAndDelete : ReceiveMode.PeekLock;
+
+            ManagementClient client = new ManagementClient(GetConnection(queue));
+
+            if (await client.TopicExistsAsync(queue.Value.QueueName))
+                throw new Exception($"Was not possible to create queue {queue.Value.QueueName}. A topic with same name already exist.");
+
+            if (! await client.QueueExistsAsync(queue.Value.QueueName))
+            {
+                await client.CreateQueueAsync(queue.Value.QueueName);
+            }
+
+            QueueClient queueReceiver = new QueueClient(GetConnection(queue), queue.Value.QueueName, receiveMode);
+
+            return queueReceiver;
         }
 
         /// <summary>
@@ -76,11 +100,10 @@ namespace Liquid.OnAzure
                 {
                     MethodInfo method = GetMethod(queue);
                     string queueName = queue.Value.QueueName;
-                    ReceiveMode receiveMode = (queue.Value.DeleteAfterRead) ? ReceiveMode.ReceiveAndDelete : ReceiveMode.PeekLock;
                     int takeQuantity = queue.Value.TakeQuantity;
 
                     //Register Trace on the telemetry 
-                    QueueClient queueReceiver = new QueueClient(GetConnection(queue), queueName, receiveMode);
+                    QueueClient queueReceiver = GetOrCreateQueueAsync(queue).Result;
 
                     //Register the method to process receive message
                     //The RegisterMessageHandler is validate for all register exist on the queue, without need loop for items
@@ -117,6 +140,53 @@ namespace Liquid.OnAzure
                 ((LightTelemetry)WorkBench.Telemetry).TrackException(moreInfo);
             }
         }
+		
+        /// <summary>
+        /// Create topic and subscription if not exists
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <returns></returns>
+        private async Task<SubscriptionClient> GetOrCreateTopicAsync(KeyValuePair<MethodInfo, TopicAttribute> topic)
+        {         
+
+            ManagementClient client = new ManagementClient(GetConnection(topic));
+
+            if (await client.QueueExistsAsync(topic.Value.TopicName))
+                throw new Exception($"Was not possible to create the topic {topic.Value.TopicName}.A queue with same name already exist.");
+
+            if (! await client.TopicExistsAsync(topic.Value.TopicName))
+            {
+                await client.CreateTopicAsync(topic.Value.TopicName);
+            }
+
+            SubscriptionClient subscription = await GetOrCreateSubscriptionAsync(topic);
+
+            return subscription;
+        }
+        /// <summary>
+        /// Create subscription if not exists
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <returns></returns>
+        private async Task<SubscriptionClient> GetOrCreateSubscriptionAsync(KeyValuePair<MethodInfo, TopicAttribute> topic)
+        {
+            ManagementClient client = new ManagementClient(GetConnection(topic));
+
+            if (!await client.SubscriptionExistsAsync(topic.Value.TopicName, topic.Value.Subscription))
+            {
+                await client.CreateSubscriptionAsync(topic.Value.TopicName, topic.Value.Subscription);
+            }
+
+            ReceiveMode receiveMode = ReceiveMode.PeekLock;
+
+            if (topic.Value.DeleteAfterRead)
+            {
+                receiveMode = ReceiveMode.ReceiveAndDelete;
+            }
+            SubscriptionClient subscription = new SubscriptionClient(GetConnection(topic), topic.Value.TopicName, topic.Value.Subscription, receiveMode, null);
+
+            return subscription;
+        }
 
         /// <summary>
         /// Method created to connect and process the Topic/Subscription in the azure.
@@ -131,15 +201,11 @@ namespace Liquid.OnAzure
                     MethodInfo method = GetMethod(topic);
                     string topicName = topic.Value.TopicName;
                     string subscriptName = topic.Value.Subscription;
-                    ReceiveMode receiveMode = ReceiveMode.PeekLock;
-                    if (topic.Value.DeleteAfterRead)
-                    {
-                        receiveMode = ReceiveMode.ReceiveAndDelete;
-                    }
+                    
                     int takeQuantity = topic.Value.TakeQuantity;
 
                     //Register Trace on the telemetry 
-                    SubscriptionClient subscriptionClient = new SubscriptionClient(GetConnection(topic), topicName, subscriptName, receiveMode, null);
+                    SubscriptionClient subscriptionClient = GetOrCreateTopicAsync(topic).Result;
 
                     //Register the method to process receive message
                     //The RegisterMessageHandler is validate for all register exist on the queue, without need loop for items
@@ -208,7 +274,6 @@ namespace Liquid.OnAzure
         {
             throw new NotImplementedException();
         }
-
 
         /// <summary>
         /// Method to run Health Check for Service Bus
