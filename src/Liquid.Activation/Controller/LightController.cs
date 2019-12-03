@@ -27,8 +27,7 @@ namespace Liquid.Activation
         //Instance of CriticHandler to inject on the others classes
         private readonly CriticHandler _criticHandler = new CriticHandler();
         public IHttpContextAccessor _httpContextAccessor;
-
-
+ 
         private LightContext GetContext()
         {
             return new LightContext(_httpContextAccessor)
@@ -57,6 +56,7 @@ namespace Liquid.Activation
             domain.Context = GetContext();
             domain.Cache = Cache;
             domain.CritictHandler = _criticHandler;
+			
             return domain;
         }
 
@@ -67,7 +67,7 @@ namespace Liquid.Activation
         /// <returns>IAResponsible</returns>
         protected IActionResult Result(DomainResponse response)
         {
-            response.PayLoad = (response.ViewModelData != null) ? response.ViewModelData.ToJsonCamelCase() : null;
+            response.PayLoad = (response.ModelData != null) ? response.ModelData.ToJsonCamelCase() : null;
 
             if (Logger?.EnabledLogTrafic == true)
             {
@@ -78,10 +78,12 @@ namespace Liquid.Activation
             {
                 return NotFound(response);
             }
-            else
-            {
-                return Ok(response);
-            }
+            
+			if (response.BadRequestMessage) return BadRequest(response);
+            
+            if(response.GenericReturnMessage) return StatusCode((int)response.StatusCode, response);
+			
+            return Ok(response);            
         }
 
         /// <summary>
@@ -168,6 +170,6 @@ namespace Liquid.Activation
                 }
             }
         }
-
     }
 }
+

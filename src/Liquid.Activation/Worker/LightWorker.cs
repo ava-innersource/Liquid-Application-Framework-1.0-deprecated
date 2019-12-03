@@ -25,8 +25,8 @@ namespace Liquid.Activation
         protected readonly static Dictionary<MethodInfo, QueueAttribute> _queues = new Dictionary<MethodInfo, QueueAttribute>();
         protected readonly static Dictionary<MethodInfo, TopicAttribute> _topics = new Dictionary<MethodInfo, TopicAttribute>();
         private readonly List<string> _inputValidationErrors = new List<string>();
-		protected ILightTelemetry Telemetry { get; } = WorkBench.Telemetry != null ? (ILightTelemetry)WorkBench.Telemetry.CloneService() : null;
-		protected ILightCache Cache => WorkBench.Cache;
+        protected ILightTelemetry Telemetry { get; } = WorkBench.Telemetry != null ? (ILightTelemetry)WorkBench.Telemetry.CloneService() : null;
+        protected ILightCache Cache => WorkBench.Cache;
         //Instance of CriticHandler to inject on the others classes
         private readonly CriticHandler _criticHandler = new CriticHandler();
 
@@ -93,14 +93,18 @@ namespace Liquid.Activation
                     {
                         if (!isDeclaredConnection(method))
                         {
-                            if (_topics.Values.FirstOrDefault(x => x.TopicName == topic.TopicName) == null)
+                            if (_topics.Values.FirstOrDefault(x => x.TopicName == topic.TopicName && x.Subscription == topic.Subscription) == null)
+                            {
                                 _topics.Add(method, topic);
+                            }
                             else
-                                throw new LightException($"There is already Topic defined with the name \"{topic.TopicName}\".");
+                            {
+                                throw new LightException($"Duplicated worker: there's already a worker for the same topic (\"{topic.TopicName}\") and subscription(\"{topic.Subscription}\")");
+                            }
                         }
                         else
                         {
-                            ///If there isn't Custom Attribute with string connection, will be throw exception.
+                            // if there isn't Custom Attribute with string connection, will be throw exception.
                             throw new LightException($"No Attribute MessageBus with a configuration string has been informed on the worker \"{method.DeclaringType}\".");
                         }
                     }
