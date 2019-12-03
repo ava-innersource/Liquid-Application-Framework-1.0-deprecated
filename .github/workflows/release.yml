@@ -1,0 +1,25 @@
+name: Release
+
+on:
+  push:    
+    tags:
+      - 'v*'
+  
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 2.2.108
+      - name: Build the solution 
+        run: dotnet build --configuration Release /p:Version=${GITHUB_REF:11}
+      - name: Pack the solution
+        run: |          
+          dotnet pack --configuration Release --output "./artifacts" /p:Version=${GITHUB_REF:11} /p:PackageVersion=${GITHUB_REF:11}
+      - name: Publish all nugets
+        run: |
+          for i in `find src -name *.nupkg | grep 'bin/Release/'`; do dotnet nuget push $i -k ${{ secrets.NugetApiKey }} -s https://api.nuget.org/v3/index.json; done
