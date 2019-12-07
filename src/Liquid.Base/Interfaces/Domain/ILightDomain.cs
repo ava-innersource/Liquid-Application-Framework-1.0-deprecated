@@ -5,6 +5,9 @@
     /// </summary>
     public interface ILightDomain
     {
+        /// <summary>
+        /// Responsible for managing issues concerning business logic
+        /// </summary>
         ICriticHandler CritictHandler { get; set; }
     }
 }
