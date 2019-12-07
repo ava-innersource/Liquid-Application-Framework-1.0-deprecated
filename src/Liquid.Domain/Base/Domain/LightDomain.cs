@@ -1,6 +1,5 @@
 ﻿using Liquid.Domain;
 using Liquid.Interfaces;
-using Newtonsoft.Json;
 
 namespace Liquid.Base.Domain
 {
@@ -22,9 +21,12 @@ namespace Liquid.Base.Domain
         public ILightContext Context { get; set; }
         public ILightCache Cache { get; set; }
         public ILightLogger Logger { get; set; }
-        protected bool HasBusinessErrors => _criticHandler != null && _criticHandler.HasBusinessErrors;
-        private ICriticHandler _criticHandler { get; set; }
-        public ICriticHandler CritictHandler { get { return _criticHandler; } set { _criticHandler = value; } }
+        protected bool HasBusinessErrors => CritictHandler?.HasBusinessErrors == true;
+
+        /// <summary>
+        /// Responsible for managing issues concerning business logic
+        /// </summary>
+        public ICriticHandler CritictHandler { get; set; }
         internal abstract void ExternalInheritanceNotAllowed();
 
         /// <summary>
@@ -59,7 +61,7 @@ namespace Liquid.Base.Domain
             AddNotFound();
             AddBusinessError(errorCode);
         }
-		
+
         /// <summary>
         /// Add to the scope that some critic has a bad request type of error
         /// </summary>
@@ -67,7 +69,7 @@ namespace Liquid.Base.Domain
         {
             HasBadRequestError = true;
         }
-		
+
         /// <summary>
         /// Add to the scope that some critic has a bad request type of error
         /// <param name="errorCode">error code of the message</param>
@@ -77,7 +79,7 @@ namespace Liquid.Base.Domain
             AddBadRequest();
             AddBusinessError(errorCode);
         }
-		
+
         /// <summary>
         /// Method add the error code to the CriticHandler
         /// and add in Critics list to build the object InvalidInputException
@@ -85,7 +87,7 @@ namespace Liquid.Base.Domain
         /// <param name="errorCode">error code of the message</param>
         protected void AddBusinessError(string errorCode)
         {
-            _criticHandler.AddBusinessError(errorCode);
+            CritictHandler?.AddBusinessError(errorCode);
         }
 
         /// <summary>
@@ -95,7 +97,7 @@ namespace Liquid.Base.Domain
         /// <param name="errorCode">error code of the message</param>
         protected void AddBusinessError(string errorCode, params object[] args)
         {
-            _criticHandler.AddBusinessError(errorCode, args);
+            CritictHandler?.AddBusinessError(errorCode, args);
         }
 
         /// <summary>
@@ -105,7 +107,7 @@ namespace Liquid.Base.Domain
         /// <param name="warningCode"></param>
         protected void AddBusinessWarning(string warningCode)
         {
-            _criticHandler.AddBusinessWarning(warningCode);
+            CritictHandler?.AddBusinessWarning(warningCode);
         }
 
         /// <summary>
@@ -115,7 +117,7 @@ namespace Liquid.Base.Domain
         /// <param name="warningCode"></param>
         protected void AddBusinessWarning(string warningCode, params object[] args)
         {
-            _criticHandler.AddBusinessWarning(warningCode, args);
+            CritictHandler?.AddBusinessWarning(warningCode, args);
         }
 
         /// <summary>
@@ -125,7 +127,7 @@ namespace Liquid.Base.Domain
         /// <param name="infoCode"></param>
         protected void AddBusinessInfo(string infoCode)
         {
-            _criticHandler.AddBusinessInfo(infoCode);
+            CritictHandler?.AddBusinessInfo(infoCode);
         }
 
         /// <summary>
@@ -135,7 +137,7 @@ namespace Liquid.Base.Domain
         /// <param name="infoCode"></param>
         protected void AddBusinessInfo(string infoCode, params object[] args)
         {
-            _criticHandler.AddBusinessInfo(infoCode, args);
+            CritictHandler?.AddBusinessInfo(infoCode, args);
         }
 
         /// <summary>
@@ -146,7 +148,7 @@ namespace Liquid.Base.Domain
         protected DomainResponse Response<T>(T data)
         {
             DomainResponse response = new DomainResponse();
-            response.Critics = (_criticHandler != null) ? _criticHandler.Critics.ToJsonCamelCase() : null;
+            response.Critics = CritictHandler?.Critics?.ToJsonCamelCase();
             response.ModelData = data;
             response.NotFoundMessage = HasNotFoundError;
             response.BadRequestMessage = HasBadRequestError;
@@ -155,7 +157,7 @@ namespace Liquid.Base.Domain
             response.OperationId = System.Diagnostics.Activity.Current?.RootId;
             return response;
         }
- 
+
         /// <summary>
         /// Returns a  instance of a LightDomain class for calling business domain logic
         /// </summary>
