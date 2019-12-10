@@ -12,7 +12,7 @@ When writing Liquid applications, you stop worrying about the technology and foc
 
 To use Liquid, you create a new base ASP.Net application and then download and install the following nuget packages:
 
-- Liquid.Base
+- LiquidApplication.Base
 - LiquidApplication.Activation
 - LiquidApplication.Domain
 - LiquidApplication.Middleware
