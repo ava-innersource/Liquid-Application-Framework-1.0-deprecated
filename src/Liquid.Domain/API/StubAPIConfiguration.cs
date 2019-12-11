@@ -47,37 +47,35 @@ namespace Liquid.Runtime.Configuration
     /// </summary>
     public class MethodStubAPIConfiguration : LightConfig<MethodStubAPIConfiguration>
     {
-        public string Name { get; set; }
+        private string _name;
+
+        /// <summary>
+        /// Gets or sets the name of the HTTP method (e.g. GET, PUT, POST).
+        /// </summary>
+        /// <remarks>By setting a value to this property, <see cref="WorkBenchServiceHttp"/> will also have its value updated.</remarks>
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (!Enum.TryParse(value, ignoreCase: true, out WorkBenchServiceHttp workBenchServiceHttp))
+                {
+                    throw new ArgumentException($"The value '{value}' is not a valid HTTP method.", nameof(value));
+                }
+
+                _name = value;
+                WorkBenchServiceHttp = workBenchServiceHttp;
+            }
+        }
+
         public string Route { get; set; }
         public JToken Request { get; set; }
         public JToken Response { get; set; }
 
-        public WorkBenchServiceHttp WorkBenchServiceHttp
-        {
-            get
-            {
-                if (Name.ToUpper() == "GET")
-                    return WorkBenchServiceHttp.GET;
-                else if (Name.ToUpper() == "POST")
-                    return WorkBenchServiceHttp.POST;
-                else if (Name.ToUpper() == "PUT")
-                    return WorkBenchServiceHttp.PUT;
-                else if (Name.ToUpper() == "OPTIONS")
-                    return WorkBenchServiceHttp.OPTIONS;
-                else if (Name.ToUpper() == "DELETE")
-                    return WorkBenchServiceHttp.DELETE;
-                else if (Name.ToUpper() == "HEAD")
-                    return WorkBenchServiceHttp.HEAD;
-                else if (Name.ToUpper() == "TRACE")
-                    return WorkBenchServiceHttp.TRACE;
-                else if (Name.ToUpper() == "CONNECT")
-                    return WorkBenchServiceHttp.CONNECT;
-                else if (Name.ToUpper() == "PATH")
-                    return WorkBenchServiceHttp.PATH;
-                else
-                    return WorkBenchServiceHttp.GET;
-            }
-        }
+        /// <summary>
+        /// Gets the value of <see cref="Name"/> converted to an <see cref="Liquid.WorkBenchServiceHttp"/>.
+        /// </summary>
+        public WorkBenchServiceHttp WorkBenchServiceHttp { get; private set; }
 
         /// <summary>
         ///  The method used to validate settings retrieved from HostStubAPIConfiguration.
