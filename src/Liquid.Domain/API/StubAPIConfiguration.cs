@@ -58,7 +58,8 @@ namespace Liquid.Runtime.Configuration
             get => _name;
             set
             {
-                if (!Enum.TryParse(value, ignoreCase: true, out WorkBenchServiceHttp workBenchServiceHttp))
+                WorkBenchServiceHttp workBenchServiceHttp;
+                if (!Enum.TryParse(value, ignoreCase: true, result: out workBenchServiceHttp))
                 {
                     throw new ArgumentException($"The value '{value}' is not a valid HTTP method.", nameof(value));
                 }
