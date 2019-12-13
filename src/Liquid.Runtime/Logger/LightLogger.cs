@@ -21,7 +21,7 @@ namespace Liquid.Runtime
         /// <summary>
         /// Injected telemetry
         /// </summary>
-        protected readonly ILightTelemetry telemetry = WorkBench.Telemetry != null ? (ILightTelemetry)WorkBench.Telemetry.CloneService() : null;
+        protected readonly ILightTelemetry telemetry = Workbench.Instance.Telemetry != null ? (ILightTelemetry)Workbench.Instance.Telemetry.CloneService() : null;
         /// <summary>
         /// Inicialize the cambright
         /// </summary>

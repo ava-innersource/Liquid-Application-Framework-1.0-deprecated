@@ -7,7 +7,7 @@ namespace Liquid.Interfaces
     /// <summary>
     /// Public interface for all Media Storage Implementations 
     /// </summary>
-    public interface ILightMediaStorage : IWorkBenchHealthCheck
+    public interface ILightMediaStorage : IWorkbenchHealthCheck
     {	
 		string Conection { get; set; }
         string Container { get; set; }

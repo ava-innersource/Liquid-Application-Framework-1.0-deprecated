@@ -33,7 +33,7 @@ namespace Liquid.Domain.API
         {
             get
             {
-                return WorkBench.Polly;
+                return Workbench.Instance.Polly;
             }
 
         }

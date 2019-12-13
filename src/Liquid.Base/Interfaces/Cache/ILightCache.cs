@@ -6,7 +6,7 @@ namespace Liquid.Interfaces
     /// <summary>
     /// Cache interface for Microservice
     /// </summary>
-    public interface ILightCache : IWorkBenchHealthCheck
+    public interface ILightCache : IWorkbenchHealthCheck
     {  
         T Get<T>(string key);
         Task<T> GetAsync<T>(string key);

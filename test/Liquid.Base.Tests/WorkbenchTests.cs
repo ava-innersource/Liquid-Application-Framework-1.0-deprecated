@@ -1,3 +1,6 @@
+﻿// Copyright (c) Avanade Inc. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -5,10 +8,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Liquid.Interfaces;
-using Newtonsoft.Json.Linq;
-using Xunit;
-using NSubstitute;
 using Liquid.Tests;
+using Newtonsoft.Json.Linq;
+using NSubstitute;
+using Xunit;
 
 namespace Liquid.Base.Tests
 {
@@ -16,92 +19,92 @@ namespace Liquid.Base.Tests
     {
         public WorkbenchTests()
         {
-            WorkBench.Reset();
+            Workbench.Instance.Reset();
         }
 
         [Fact]
         public void WhenUseMediaStorageThenGetMediaStorageReturnsSame()
         {
-            WorkBench.UseMediaStorage<MockMediaStorage>();
+            Workbench.Instance.UseMediaStorage<MockMediaStorage>();
 
-            Assert.IsAssignableFrom<MockMediaStorage>(WorkBench.MediaStorage);
+            Assert.IsAssignableFrom<MockMediaStorage>(Workbench.Instance.MediaStorage);
         }
 
         [Fact]
         public void WhenUseRepositoryThenGetRepositoryReturnsSame()
         {
-            WorkBench.UseRepository<MockRepository>();
+            Workbench.Instance.UseRepository<MockRepository>();
 
-            Assert.IsAssignableFrom<MockRepository>(WorkBench.Repository);
+            Assert.IsAssignableFrom<MockRepository>(Workbench.Instance.Repository);
         }
 
         [Fact]
         public void WhenUseMessageBusThenGetMessageBusReturnsSame()
         {
-            WorkBench.UseMessageBus<MockWorker>();
+            Workbench.Instance.UseMessageBus<MockWorker>();
 
             // TODO: How to get the message bus? No shortcut?
-            // Assert.IsAssignableFrom<MockWorker>(WorkBench.);
+            // Assert.IsAssignableFrom<MockWorker>(Workbench.Instance.);
         }
 
         [Fact]
         public void WhenUseTelemetryThenGetTelemetryReturnsSame()
         {
-            WorkBench.UseTelemetry<MockTelemetry>();
+            Workbench.Instance.UseTelemetry<MockTelemetry>();
 
-            Assert.IsAssignableFrom<MockTelemetry>(WorkBench.Telemetry);
+            Assert.IsAssignableFrom<MockTelemetry>(Workbench.Instance.Telemetry);
         }
 
         [Fact]
         public void WhenUseEnventHandlerThenGetEventHandlerReturnsSame()
         {
-            WorkBench.UseEnventHandler<MockEventHandler>();
+            Workbench.Instance.UseEventHandler<MockEventHandler>();
 
-            Assert.IsAssignableFrom<MockEventHandler>(WorkBench.Event);
+            Assert.IsAssignableFrom<MockEventHandler>(Workbench.Instance.Event);
         }
 
         [Fact]
         public void WhenUseCacheThenGetCacheReturnsSame()
         {
-            WorkBench.UseCache<MockCache>();
+            Workbench.Instance.UseCache<MockCache>();
 
-            Assert.IsAssignableFrom<MockCache>(WorkBench.Cache);
+            Assert.IsAssignableFrom<MockCache>(Workbench.Instance.Cache);
         }
 
         [Fact]
         public void WhenUseLoggerThenGetLoggerReturnsSame()
         {
-            WorkBench.UseLogger<MockLogger>();
+            Workbench.Instance.UseLogger<MockLogger>();
 
-            Assert.IsAssignableFrom<MockLogger>(WorkBench.Logger);
+            Assert.IsAssignableFrom<MockLogger>(Workbench.Instance.Logger);
         }
 
         [Theory, AutoSubstituteData]
-        public void GetRegisteredServiceReturnsWhatWasAddedByAddToCache(WorkBenchServiceType type, IWorkBenchService service)
+        public void GetRegisteredServiceReturnsWhatWasAddedByAddToCache(WorkbenchServiceType type, IWorkBenchService service)
         {
-            WorkBench.AddToCache(type, service);
+            Workbench.Instance.AddToCache(type, service);
 
-            Assert.Same(service, WorkBench.GetRegisteredService(type));
+            Assert.Same(service, Workbench.Instance.GetRegisteredService(type));
         }
 
         [Theory, AutoSubstituteData]
-        public void AddToCacheSameServiceTypeTwiceThrows(WorkBenchServiceType type, IWorkBenchService service1, IWorkBenchService service2)
+        public void AddToCacheSameServiceTypeTwiceThrows(WorkbenchServiceType type, IWorkBenchService service1, IWorkBenchService service2)
         {
-            WorkBench.AddToCache(type, service1);
+            Workbench.Instance.AddToCache(type, service1);
 
             // throws with the same service
-            Assert.ThrowsAny<Exception>(() => WorkBench.AddToCache(type, service1));
+            Assert.ThrowsAny<Exception>(() => Workbench.Instance.AddToCache(type, service1));
 
             // and with a different service
-            Assert.ThrowsAny<Exception>(() => WorkBench.AddToCache(type, service2));
+            Assert.ThrowsAny<Exception>(() => Workbench.Instance.AddToCache(type, service2));
         }
 
         [Theory, AutoSubstituteData]
-        public void GetRegisteredServiceCallsInitializeOnService(WorkBenchServiceType type, IWorkBenchService service)
+        public void GetRegisteredServiceCallsInitializeOnService(WorkbenchServiceType type, IWorkBenchService service)
         {
-            WorkBench.AddToCache(type, service);
+            Workbench.Instance.AddToCache(type, service);
 
-            WorkBench.GetRegisteredService(type);
+            Workbench.Instance.GetRegisteredService(type);
 
             service.Received(1).Initialize();
         }

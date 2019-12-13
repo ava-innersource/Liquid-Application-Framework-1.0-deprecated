@@ -13,11 +13,11 @@ namespace Liquid.Tests
     /// [Theory, AutoSubstituteData]
     /// public void AddToCacheSameServiceTypeTwiceThrows(WorkBenchServiceType type, IWorkBenchService service1, IWorkBenchService service2)
     /// {
-    ///     WorkBench.AddToCache(type, service1);
+    ///     Workbench.Instance.AddToCache(type, service1);
     ///
-    ///     Assert.ThrowsAny<Exception>(() => WorkBench.AddToCache(type, service1));
+    ///     Assert.ThrowsAny<Exception>(() => Workbench.Instance.AddToCache(type, service1));
     ///
-    ///     Assert.ThrowsAny<Exception>(() => WorkBench.AddToCache(type, service2));
+    ///     Assert.ThrowsAny<Exception>(() => Workbench.Instance.AddToCache(type, service2));
     /// }
     /// </code>
     /// </example>
