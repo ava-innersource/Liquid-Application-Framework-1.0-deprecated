@@ -1,0 +1,13 @@
+﻿# EDITOR CONFIG FOR UNIT TESTS
+
+[*.cs]
+
+# SA1600: Elements should be documented - not necessary in unit tests, given their nature
+dotnet_diagnostic.SA1600.severity = none
+
+# SA1200: Using directives should be placed correctly - this is no longer considered good practice (results in IDE0062)
+dotnet_diagnostic.SA1200.severity = none
+
+# SA1133: Do not combine attributes - in tests, it's usual to add [Theory, AutoData] instead of using two lines
+# TODO: See if we can configure it to work only with Theory attributes
+dotnet_diagnostic.SA1133.severity = none
