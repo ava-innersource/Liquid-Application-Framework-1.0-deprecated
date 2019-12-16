@@ -8,6 +8,7 @@ using Liquid.Interfaces;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using NSubstitute;
+using Liquid.Tests;
 
 namespace Liquid.Base.Tests
 {

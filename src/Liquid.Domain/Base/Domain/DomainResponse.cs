@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Liquid.Domain;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace Liquid.Base.Domain
 {
@@ -28,7 +30,7 @@ namespace Liquid.Base.Domain
         /// <summary>
         /// Business critics produced by domain business logic
         /// </summary>
-        public JToken Critics { get; set; }
+        public JToken Critics { get; set; } = new List<Critic>().ToJson();
 
         /// <summary>
         /// Identifies the current operation

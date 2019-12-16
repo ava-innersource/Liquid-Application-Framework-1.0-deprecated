@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Liquid.Domain.Tests</name>
+    </assembly>
+    <members>
+        <member name="M:Liquid.Domain.Tests.LightApiTests.EqualsMatcher``1(``0)">
+            <summary>
+            Creates a function that checks whether the serialized object is equivalent to
+            the object <paramref name="expectedObject"/>.
+            </summary>
+            <param name="expectedObject">What the object was expected to be.</param>
+            <returns>The matching function.</returns>
+            <remarks>
+            This function relies on the <see cref="M:System.Object.Equals(System.Object)"/> override of 
+            <paramref name="expectedObject"/>.
+            </remarks>
+        </member>
+        <member name="T:Liquid.Domain.Tests.MockRequestPayload">
+            <summary>
+            Used by <see cref="T:Liquid.Domain.Tests.LightApiTests"/>.
+            </summary>
+        </member>
+        <member name="T:Liquid.Domain.Tests.MockResponsePayload">
+            <summary>
+            Used by <see cref="T:Liquid.Domain.Tests.LightApiTests"/>.
+            </summary>
+        </member>
+    </members>
+</doc>

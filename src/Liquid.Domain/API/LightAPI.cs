@@ -14,12 +14,23 @@ using System.Threading.Tasks;
 namespace Liquid.Domain.API
 {
     /// <summary>
-    /// This API provide a simple way to consume rest services
+    /// A simple specializaton over <see cref="HttpClient"/> to <b>communicate with other Liquid based services</b>.
     /// </summary>
+    /// <remarks>
+    /// <see cref="LightApi"/> is a very restrictive HTTP Client that
+    /// should be used to communicate with RESTful API's. 
+    /// 
+    /// It's goal is, primary, to simplify communicatioin with other 
+    /// Liquid services. Other use cases aren't recommended.
+    /// </remarks>
     public sealed class LightApi : AbstractApiWrapper
     {
         private ICriticHandler CritictHandler { get; set; }
-        private HttpClient httpClient = new HttpClient();
+        
+        /// <summary>
+        /// Used throughout LightApi to communicate with external services.
+        /// </summary>
+        private HttpClient _httpClient = new HttpClient();
 
         /// <summary>
         /// Initilizes API from fixed hostname, port and token
@@ -42,15 +53,11 @@ namespace Liquid.Domain.API
         /// <param name="token">token authentication</param>
         public LightApi(string apiName, string token) : base($"{nameof(LightApi)}:{apiName}", token) { }
 
-
         public void SetTestClient(HttpClient client)
         {
-            httpClient = client;
+            _httpClient = client;
             _endpoint = _suffix + "/";
         }
-
-
-
 
         /// <summary>
         ///  Methods Sync that GETs the object that processes requests for the route.
@@ -66,21 +73,21 @@ namespace Liquid.Domain.API
             ///Create the Request
             try
             {
-                httpClient.DefaultRequestHeaders.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json; charset=utf-8");
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json; charset=utf-8");
                 ///Sends the authorization token if exisists
                 if (!string.IsNullOrEmpty(_token))
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
                 if (header != null)
                     foreach (var item in header)
                     {
-                        httpClient.DefaultRequestHeaders.Add(item.Key, item.Value);
+                        _httpClient.DefaultRequestHeaders.Add(item.Key, item.Value);
                     }
 
                 ///Get the Response from the API
-                var httpResponseMessage = base.ResilientRequest(MakeUri(serviceRoute), httpClient, WorkBenchServiceHttp.GET).Result;
+                var httpResponseMessage = base.ResilientRequest(MakeUri(serviceRoute), _httpClient, WorkBenchServiceHttp.GET).Result;
 
                 if (typeof(T).Equals(typeof(HttpResponseMessage)))
                 {
@@ -110,21 +117,21 @@ namespace Liquid.Domain.API
             /// Create the Request
             try
             {
-                httpClient.DefaultRequestHeaders.Clear();
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json; charset=utf-8");
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json; charset=utf-8");
                 ///Send the authentication token if exisists
                 if (!string.IsNullOrEmpty(_token))
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
                 if (header != null)
                     foreach (var item in header)
                     {
-                        httpClient.DefaultRequestHeaders.Add(item.Key, item.Value);
+                        _httpClient.DefaultRequestHeaders.Add(item.Key, item.Value);
                     }
 
                 ///Get the Response
-                var httpResponseMessage = base.ResilientRequest(MakeUri(serviceRoute), httpClient, WorkBenchServiceHttp.GET).Result;
+                var httpResponseMessage = base.ResilientRequest(MakeUri(serviceRoute), _httpClient, WorkBenchServiceHttp.GET).Result;
 
                 return HandleResult(JToken.Parse(httpResponseMessage.Content.ReadAsStringAsync().Result));
             }
@@ -135,7 +142,6 @@ namespace Liquid.Domain.API
             }
             ///If no Exceptions, returns the result
         }
-
 
         /// <summary>
         /// Method Sync that POST the object that processes requests for the route and returns a Typed response.
@@ -186,6 +192,7 @@ namespace Liquid.Domain.API
         {
             return Send("PUT", serviceRoute, body, header);
         }
+        
         public override T Delete<T>(string serviceRoute, [Optional]Dictionary<string, string> headers)
         {
             serviceRoute = serviceRoute.Replace(Environment.NewLine, string.Empty).Replace("\"", "'");
@@ -196,16 +203,16 @@ namespace Liquid.Domain.API
 
                 ///Sends the authorization token if exisists
                 if (!string.IsNullOrEmpty(_token))
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
 
                 if (headers != null)
                     foreach (var item in headers)
                     {
-                        httpClient.DefaultRequestHeaders.Add(item.Key, item.Value);
+                        _httpClient.DefaultRequestHeaders.Add(item.Key, item.Value);
                     }
                 ///Get the Response
-                var response = base.ResilientRequest(MakeUri(serviceRoute), httpClient, WorkBenchServiceHttp.DELETE).Result;
+                var response = base.ResilientRequest(MakeUri(serviceRoute), _httpClient, WorkBenchServiceHttp.DELETE).Result;
 
                 if (typeof(T).Equals(typeof(HttpResponseMessage)))
                 {
@@ -233,15 +240,15 @@ namespace Liquid.Domain.API
 
                 ///Sends the authorization token if exisists
                 if (!string.IsNullOrEmpty(_token))
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
                 if (headers != null)
                     foreach (var item in headers)
                     {
-                        httpClient.DefaultRequestHeaders.Add(item.Key, item.Value);
+                        _httpClient.DefaultRequestHeaders.Add(item.Key, item.Value);
                     }
                 ///Get the Response
-                var response = base.ResilientRequest(MakeUri(serviceRoute), httpClient, WorkBenchServiceHttp.DELETE).Result;
+                var response = base.ResilientRequest(MakeUri(serviceRoute), _httpClient, WorkBenchServiceHttp.DELETE).Result;
 
                 ///return new DomainResponse
                 return new DomainResponse()
@@ -256,9 +263,6 @@ namespace Liquid.Domain.API
             }
         }
 
-
-
-
         /// <summary>
         /// Send a POST or PUT operation expecting a result from a JSON type.
         /// </summary>
@@ -272,7 +276,7 @@ namespace Liquid.Domain.API
                 {
                     ///Send the authentication token if exisists
                     if (!String.IsNullOrEmpty(_token))
-                        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+                        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
 
                     if (headers != null)
@@ -307,7 +311,6 @@ namespace Liquid.Domain.API
             return default(JToken);
         }
 
-
         /// <summary>
         /// Send a POST or PUT operation expecting a result from a JSON type.
         /// </summary>
@@ -320,23 +323,23 @@ namespace Liquid.Domain.API
 
                 ///Send the authentication token if exisists
                 if (!String.IsNullOrEmpty(_token))
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
 
                 if (headers != null)
                 {
                     foreach (var item in headers)
                     {
-                        httpClient.DefaultRequestHeaders.Add(item.Key, item.Value);
+                        _httpClient.DefaultRequestHeaders.Add(item.Key, item.Value);
                     }
                 }
 
                 HttpResponseMessage response;
 
                 if (operation == "POST")
-                    response = await base.ResilientRequest(MakeUri(serviceRoute), httpClient, WorkBenchServiceHttp.POST, body.ConvertToByteArrayContent());
+                    response = await base.ResilientRequest(MakeUri(serviceRoute), _httpClient, WorkBenchServiceHttp.POST, body.ConvertToByteArrayContent());
                 else
-                    response = await base.ResilientRequest(MakeUri(serviceRoute), httpClient, WorkBenchServiceHttp.PUT, body.ConvertToByteArrayContent());
+                    response = await base.ResilientRequest(MakeUri(serviceRoute), _httpClient, WorkBenchServiceHttp.PUT, body.ConvertToByteArrayContent());
 
                 if (typeof(T).Equals(typeof(HttpResponseMessage)))
                 {
@@ -372,23 +375,23 @@ namespace Liquid.Domain.API
 
                 ///Send the authentication token if exisists
                 if (!String.IsNullOrEmpty(_token))
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
 
                 if (headers != null)
                 {
                     foreach (var item in headers)
                     {
-                        httpClient.DefaultRequestHeaders.Add(item.Key, item.Value);
+                        _httpClient.DefaultRequestHeaders.Add(item.Key, item.Value);
                     }
                 }
 
                 HttpResponseMessage response;
 
                 if (operation == "POST")
-                    response = await base.ResilientRequest(MakeUri(serviceRoute), httpClient, WorkBenchServiceHttp.POST, body.ConvertToByteArrayContent());
+                    response = await base.ResilientRequest(MakeUri(serviceRoute), _httpClient, WorkBenchServiceHttp.POST, body.ConvertToByteArrayContent());
                 else
-                    response = await base.ResilientRequest(MakeUri(serviceRoute), httpClient, WorkBenchServiceHttp.PUT, body.ConvertToByteArrayContent());
+                    response = await base.ResilientRequest(MakeUri(serviceRoute), _httpClient, WorkBenchServiceHttp.PUT, body.ConvertToByteArrayContent());
 
                 if (typeof(T).Equals(typeof(HttpResponseMessage)))
                 {
@@ -504,19 +507,19 @@ namespace Liquid.Domain.API
                 {
                     foreach (var item in headers)
                     {
-                        httpClient.DefaultRequestHeaders.Add(item.Key, item.Value);
+                        _httpClient.DefaultRequestHeaders.Add(item.Key, item.Value);
                     }
                 }
 
                 /// Sends a authorizarion token, if it exists
                 if (!string.IsNullOrEmpty(_token))
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
                 WorkBenchServiceHttp httpMethod = WorkBenchServiceHttp.POST;
                 if (operation == "PUT")
                     httpMethod = WorkBenchServiceHttp.PUT;
 
-                var httpResponse = base.ResilientRequest(this.MakeUri(serviceRoute), httpClient, httpMethod, body.ConvertToByteArrayContent()).Result;
+                var httpResponse = ResilientRequest(MakeUri(serviceRoute), _httpClient, httpMethod, body.ConvertToByteArrayContent()).Result;
                 if (typeof(T).Equals(typeof(HttpResponseMessage)))
                 {
                     return (T)Convert.ChangeType(httpResponse, typeof(T));
@@ -544,7 +547,6 @@ namespace Liquid.Domain.API
                 throw new LightException($"Error on API call Rest. OP: {operation} || SR: {MakeUri(serviceRoute)} || BD: {exBody} || HD: {sb.ToString()} || EX: {ex.Message} || ST:{ex.StackTrace}", ex);
             }
         }
-
 
         /// <summary>
         /// Send a POST or PUT operation expecting a result from a JSON type.
@@ -609,6 +611,5 @@ namespace Liquid.Domain.API
                 throw new LightException($"Error on API call Rest. OP: {operation} || SR: {MakeUri(serviceRoute)} || BD: {exBody} || HD: {sb.ToString()} || EX: {ex.Message} || ST:{ex.StackTrace}", ex);
             }
         }
-
     }
 }
