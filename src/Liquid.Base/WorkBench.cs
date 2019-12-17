@@ -153,5 +153,13 @@ namespace Liquid
             InitializeServices();
         }
 
+        /// <summary>
+        /// Resets the service cache by removing all cached services.
+        /// </summary>
+        public static void Reset()
+        {
+            _singletonCache.Clear();
+            _isServicesUp = false;
+        }
     }
 }
