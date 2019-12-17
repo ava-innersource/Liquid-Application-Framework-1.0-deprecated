@@ -47,25 +47,36 @@ namespace Liquid.Runtime.Configuration
     /// </summary>
     public class MethodStubAPIConfiguration : LightConfig<MethodStubAPIConfiguration>
     {
+        /// <summary>
+        /// Holds the actual value for the <see cref="Name"/> property.
+        /// </summary>
         private string _name;
 
         /// <summary>
         /// Gets or sets the name of the HTTP method (e.g. GET, PUT, POST).
         /// </summary>
+        /// <seealso cref="Liquid.WorkBenchServiceHttp"/>
+        /// <seealso cref="WorkBenchServiceHttp"/>
         /// <remarks>By setting a value to this property, <see cref="WorkBenchServiceHttp"/> will also have its value updated.</remarks>
+        [Obsolete("Use " + nameof(WorkBenchServiceHttp) + " instead.")]
         public string Name
         {
             get => _name;
             set
             {
-                WorkBenchServiceHttp workBenchServiceHttp;
-                if (!Enum.TryParse(value, ignoreCase: true, result: out workBenchServiceHttp))
+                if (!Enum.TryParse(value, true, out WorkBenchServiceHttp workBenchServiceHttp))
                 {
                     throw new ArgumentException($"The value '{value}' is not a valid HTTP method.", nameof(value));
                 }
 
-                _name = value;
-                WorkBenchServiceHttp = workBenchServiceHttp;
+                //This prevents developers from making typos when setting the value of the HTTP method
+                if (!Enum.IsDefined(typeof(WorkBenchServiceHttp), workBenchServiceHttp))
+                {
+                    throw new ArgumentException($"The value '{value}' is not a valid HTTP method.", nameof(value));
+                }
+
+                _name = workBenchServiceHttp.ToString();
+                _workBenchServiceHttp = workBenchServiceHttp;
             }
         }
 
@@ -74,9 +85,30 @@ namespace Liquid.Runtime.Configuration
         public JToken Response { get; set; }
 
         /// <summary>
-        /// Gets the value of <see cref="Name"/> converted to an <see cref="Liquid.WorkBenchServiceHttp"/>.
+        /// Holds the actual value for the <see cref="WorkBenchServiceHttp"/> property.
         /// </summary>
-        public WorkBenchServiceHttp WorkBenchServiceHttp { get; private set; }
+        private WorkBenchServiceHttp _workBenchServiceHttp;
+
+        /// <summary>
+        /// Gets or sets the HTTP method (e.g GET, PUT, POST).
+        /// </summary>
+        /// <seealso cref="Liquid.WorkBenchServiceHttp"/>
+        /// <remarks>By setting a value to this property, <see cref="Name"/> will also have its value updated.</remarks>
+        public WorkBenchServiceHttp WorkBenchServiceHttp
+        {
+            get => _workBenchServiceHttp;
+            set
+            {
+                //This prevents developers from making typos when setting the value of the HTTP method
+                if (!Enum.IsDefined(typeof(WorkBenchServiceHttp), value))
+                {
+                    throw new ArgumentException($"The value '{value}' is not a valid HTTP method.", nameof(value));
+                }
+
+                _workBenchServiceHttp = value;
+                _name = value.ToString();
+            }
+        }
 
         /// <summary>
         ///  The method used to validate settings retrieved from HostStubAPIConfiguration.
