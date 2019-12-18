@@ -20,7 +20,7 @@ namespace Liquid.Domain.API
     /// <see cref="LightApi"/> is a very restrictive HTTP Client that
     /// should be used to communicate with RESTful API's. 
     /// 
-    /// It's goal is, primary, to simplify communicatioin with other 
+    /// Its goal is, primary, to simplify communication with other 
     /// Liquid services. Other use cases aren't recommended.
     /// </remarks>
     public sealed class LightApi : AbstractApiWrapper
@@ -431,7 +431,8 @@ namespace Liquid.Domain.API
                 {
                     this.CritictHandler = _lightDomain.CritictHandler;
                 }
-                List<Critic> critics = domainResponse.Critics.ToObject<List<Critic>>();
+                
+                List<Critic> critics = domainResponse.Critics?.ToObject<List<Critic>>();
                 // If the response contains critics it should be add to critic handler
                 if (critics != null && critics.Count > 0)
                 {
@@ -464,7 +465,7 @@ namespace Liquid.Domain.API
                 if (_lightDomain != null)
                     CritictHandler = _lightDomain.CritictHandler;
 
-                var critics = domainResponse.Critics.ToObject<List<Critic>>();
+                var critics = domainResponse.Critics?.ToObject<List<Critic>>();
                 /// If the response contains critics it should be add to critic handler
                 if (critics != null && critics.Count > 0)
                 {

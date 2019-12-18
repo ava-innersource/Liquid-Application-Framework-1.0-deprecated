@@ -3,7 +3,6 @@
 
 namespace Liquid.Domain.Tests
 {
-
     /// <summary>
     /// Used by <see cref="LightApiTests"/>.
     /// </summary>
@@ -24,6 +23,11 @@ namespace Liquid.Domain.Tests
             }
 
             return Message == otherRequest.Message;
+        }
+
+        public override int GetHashCode()
+        {
+            return Message.GetHashCode();
         }
     }
 }

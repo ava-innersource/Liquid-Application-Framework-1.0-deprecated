@@ -8,7 +8,6 @@ using Liquid.Base.Domain;
 using Liquid.Domain.API;
 using Liquid.Tests;
 using Newtonsoft.Json;
-using WireMock.Matchers;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Server;
@@ -16,7 +15,7 @@ using Xunit;
 
 namespace Liquid.Domain.Tests
 {
-    public partial class LightApiTests
+    public class LightApiTests
     {
         private readonly FluentMockServer _server = FluentMockServer.Start();
 
@@ -155,14 +154,6 @@ namespace Liquid.Domain.Tests
             Assert.Equal(payload?.Data, JsonConvert.DeserializeObject<DomainResponse>(payloadAsString).PayLoad.SelectToken(".data"));
         }
 
-        private DomainResponse ToDomainResponse(MockResponsePayload payload)
-        {
-            return new DomainResponse
-            {
-                PayLoad = payload.ToJsonCamelCase(),
-            };
-        }
-
         /// <summary>
         /// Creates a function that checks whether the serialized object is equivalent to
         /// the object <paramref name="expectedObject"/>.
@@ -170,7 +161,7 @@ namespace Liquid.Domain.Tests
         /// <param name="expectedObject">What the object was expected to be.</param>
         /// <returns>The matching function.</returns>
         /// <remarks>
-        /// This function relies on the <see cref="object.Equals(object)"/> override of 
+        /// This function relies on the <see cref="object.Equals(object)"/> override of
         /// <paramref name="expectedObject"/>.
         /// </remarks>
         private static Func<byte[], bool> EqualsMatcher<T>(T expectedObject)
@@ -181,6 +172,14 @@ namespace Liquid.Domain.Tests
                 var received = JsonConvert.DeserializeObject<T>(objAsStr);
 
                 return expectedObject.Equals(received);
+            };
+        }
+
+        private DomainResponse ToDomainResponse(MockResponsePayload payload)
+        {
+            return new DomainResponse
+            {
+                PayLoad = payload.ToJsonCamelCase(),
             };
         }
     }

@@ -30,7 +30,7 @@ namespace Liquid.Base.Domain
         /// <summary>
         /// Business critics produced by domain business logic
         /// </summary>
-        public JToken Critics { get; set; } = new List<Critic>().ToJson();
+        public JToken Critics { get; set; }
 
         /// <summary>
         /// Identifies the current operation
