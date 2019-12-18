@@ -43,8 +43,8 @@ namespace Liquid.Base.Tests
         {
             Workbench.Instance.UseMessageBus<MockWorker>();
 
-            // TODO: How to get the message bus? No shortcut?
-            // Assert.IsAssignableFrom<MockWorker>(Workbench.Instance.);
+            // TODO: No shortcut for the message bus... why?
+            Assert.IsAssignableFrom<MockWorker>(Workbench.Instance.GetRegisteredService(WorkbenchServiceType.Worker));
         }
 
         [Fact]
@@ -403,10 +403,7 @@ namespace Liquid.Base.Tests
 
         private class MockWorker : ILightWorker
         {
-            public void Initialize()
-            {
-                throw new NotImplementedException();
-            }
+            public void Initialize() { }
         }
 
         private class MockEventHandler : ILightEvent
