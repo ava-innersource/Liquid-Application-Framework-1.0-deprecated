@@ -403,7 +403,9 @@ namespace Liquid.Base.Tests
 
         private class MockWorker : ILightWorker
         {
-            public void Initialize() { }
+            public void Initialize()
+            {
+            }
         }
 
         private class MockEventHandler : ILightEvent

@@ -1,4 +1,7 @@
-﻿using AutoFixture;
+﻿// Copyright (c) Avanade Inc. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using AutoFixture.Xunit2;
 
@@ -27,7 +30,7 @@ namespace Liquid.Tests
         /// Initializes a new instance of the <see cref="AutoSubstituteDataAttribute"/> class.
         /// </summary>
         public AutoSubstituteDataAttribute()
-                : base(() => new Fixture().Customize(new AutoNSubstituteCustomization()))
+            : base(() => new Fixture().Customize(new AutoNSubstituteCustomization()))
         {
             // empty
         }
