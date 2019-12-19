@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Liquid.Domain;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace Liquid.Base.Domain
 {

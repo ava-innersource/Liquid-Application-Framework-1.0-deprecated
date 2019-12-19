@@ -80,7 +80,6 @@ namespace Liquid.Domain.API
             }
         }
 
-
         /// <summary>
         ///   Method that asynchronously gets the object that processes requests for the route.
         /// </summary>
