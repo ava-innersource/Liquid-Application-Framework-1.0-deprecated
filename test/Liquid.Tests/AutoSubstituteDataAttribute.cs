@@ -2,7 +2,7 @@
 using AutoFixture.AutoNSubstitute;
 using AutoFixture.Xunit2;
 
-namespace Liquid.Base.Tests
+namespace Liquid.Tests
 {
     /// <summary>
     /// Configure a <see cref="Xunit.TheoryAttribute"/> to use NSubstitute to create mocks for interfaces.

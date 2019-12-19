@@ -2,3 +2,7 @@
 
 # CA2007: Consider calling ConfigureAwait on the awaited task - disabled since this isn't a GUI project
 dotnet_diagnostic.CA2007.severity = none
+
+
+# SA1101: Prefix local calls with this - Not really necessary since we prefix elements with "_"
+dotnet_diagnostic.SA1101.severity = none
