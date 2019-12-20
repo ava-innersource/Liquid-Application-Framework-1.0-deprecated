@@ -111,7 +111,7 @@ namespace Liquid.Base.Tests
 
         private class MockMediaStorage : ILightMediaStorage
         {
-            public string Conection { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+            public string Connection { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
             public string Container { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 

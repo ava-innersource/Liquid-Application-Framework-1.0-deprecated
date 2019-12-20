@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Liquid.Interfaces
 {
@@ -9,6 +10,11 @@ namespace Liquid.Interfaces
         string ContentType { get; set; }
         string MediaLink { get; set; }
         Stream MediaStream { get; set; }
+        /// <summary>
+        /// The directory where the attachment will be stored into.
+        /// </summary>
         string ResourceId { get; set; }
+
+        //string DirectoryName { get; set; }
     }
 }
