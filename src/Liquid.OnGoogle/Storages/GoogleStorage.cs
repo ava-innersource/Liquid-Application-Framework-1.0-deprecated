@@ -11,7 +11,7 @@ namespace Liquid.OnGoogle
     public class GoogleStorage : ILightMediaStorage
     {
         public int MyProperty { get; set; }
-        public string Conection { get; set; } // projectID
+        public string Connection { get; set; } // projectID
         public string Container { get; set; } // bucketName
         public dynamic mediaStorageConfiguration { get; set; }
 
@@ -23,7 +23,7 @@ namespace Liquid.OnGoogle
             var credential = GoogleCredential.GetApplicationDefault();
             _client = StorageClient.Create(credential);
             // Make an authenticated API request. 
-            _bucket = _client.CreateBucket(this.Conection, this.Container);
+            _bucket = _client.CreateBucket(this.Connection, this.Container);
             Workbench.Instance.Repository.SetMediaStorage(this);
         }
 
