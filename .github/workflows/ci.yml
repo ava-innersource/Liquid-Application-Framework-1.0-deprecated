@@ -12,13 +12,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Start Azurite (Azure Blob Storage emulator)
+        run: docker run --name azurite -d -p 10000:10000 -p 10001:10001 mcr.microsoft.com/azure-storage/azurite
+
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
-        with:
+        with:      
           dotnet-version: 2.2.108
-      - name: Test solution
-        run: dotnet test
+
+      - name: Restore packages
+        run: dotnet restore
+
       - name: Build solution 
-        run: dotnet build --configuration Release
-    
+        run: dotnet build
+
+      - name: Test solution
+        run: dotnet test      
