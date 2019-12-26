@@ -49,7 +49,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Liquid.Domain.Tests", "test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Liquid.Tests", "test\Liquid.Tests\Liquid.Tests.csproj", "{6BA7DC4B-0F66-415A-AE74-5DEA5D3943D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Liquid.OnAzure.Tests", "test\Liquid.OnAzure.Tests\Liquid.OnAzure.Tests.csproj", "{9DEA4109-7542-40D5-9CCF-A673C9787E6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Liquid.OnAzure.Tests", "test\Liquid.OnAzure.Tests\Liquid.OnAzure.Tests.csproj", "{9DEA4109-7542-40D5-9CCF-A673C9787E6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -136,6 +136,7 @@ Global
 		{5279F425-0A2C-4889-968D-FFEB25975453} = {6A0B6B3D-15FE-4C0B-97A1-7897E31C0C4E}
 		{90CF0830-CD3C-4DD7-8C90-584772885BE0} = {6A0B6B3D-15FE-4C0B-97A1-7897E31C0C4E}
 		{6BA7DC4B-0F66-415A-AE74-5DEA5D3943D5} = {6A0B6B3D-15FE-4C0B-97A1-7897E31C0C4E}
+		{9DEA4109-7542-40D5-9CCF-A673C9787E6D} = {6A0B6B3D-15FE-4C0B-97A1-7897E31C0C4E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1E0953B7-A30F-4440-9719-22CA017677B5}

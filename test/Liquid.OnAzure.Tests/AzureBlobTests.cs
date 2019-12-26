@@ -9,7 +9,6 @@ using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using Liquid.Interfaces;
 using Liquid.Repository;
-using Liquid.Tests;
 using Microsoft.WindowsAzure.Storage;
 using NSubstitute;
 using Xunit;
@@ -89,8 +88,7 @@ namespace Liquid.OnAzure.Tests
             Assert.Equal(_expectedData, actual);
         }
 
-        [Theory]
-        [AutoSubstituteData]
+        [Fact]
         public async Task WhenResourceRemovedCantGet()
         {
             await _sut.InsertUpdateAsync(_lightAttachment);
