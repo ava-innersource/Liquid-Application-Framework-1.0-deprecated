@@ -80,7 +80,7 @@ namespace Liquid.Base.Tests
         }
 
         [Theory, AutoSubstituteData]
-        public void GetRegisteredServiceReturnsWhatWasAddedByAddToCache(WorkbenchServiceType type, IWorkBenchService service)
+        public void GetRegisteredServiceReturnsWhatWasAddedByAddToCache(WorkbenchServiceType type, IWorkbenchService service)
         {
             Workbench.Instance.AddToCache(type, service);
 
@@ -88,7 +88,7 @@ namespace Liquid.Base.Tests
         }
 
         [Theory, AutoSubstituteData]
-        public void AddToCacheSameServiceTypeTwiceThrows(WorkbenchServiceType type, IWorkBenchService service1, IWorkBenchService service2)
+        public void AddToCacheSameServiceTypeTwiceThrows(WorkbenchServiceType type, IWorkbenchService service1, IWorkbenchService service2)
         {
             Workbench.Instance.AddToCache(type, service1);
 
@@ -100,7 +100,7 @@ namespace Liquid.Base.Tests
         }
 
         [Theory, AutoSubstituteData]
-        public void GetRegisteredServiceCallsInitializeOnService(WorkbenchServiceType type, IWorkBenchService service)
+        public void GetRegisteredServiceCallsInitializeOnService(WorkbenchServiceType type, IWorkbenchService service)
         {
             Workbench.Instance.AddToCache(type, service);
 
@@ -198,7 +198,8 @@ namespace Liquid.Base.Tests
                 throw new NotImplementedException();
             }
 
-            public Task<T> GetByIdAsync<T>(string entityId) where T : new()
+            public Task<T> GetByIdAsync<T>(string entityId)
+                where T : new()
             {
                 throw new NotImplementedException();
             }
