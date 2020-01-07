@@ -13,7 +13,7 @@ namespace Liquid
         Repository,
 
         /// <summary>
-        /// Service used to record events and general data in telemetry
+        /// Service used to record events and general data in telemetry.
         /// </summary>
         Telemetry,
 
@@ -55,7 +55,7 @@ namespace Liquid
         Repository = WorkbenchServiceType.Repository,
 
         /// <summary>
-        /// Service used to record events and general data in telemetry
+        /// Service used to record events and general data in telemetry.
         /// </summary>
         Telemetry = WorkbenchServiceType.Telemetry,
 

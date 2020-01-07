@@ -9,47 +9,47 @@ namespace Liquid
     public enum WorkBenchServiceHttp
     {
         /// <summary>
-        /// Represents an HTTP GET protocol method.
+        /// Represents a HTTP protocol GET method. Commonly used to obtain informations regarding an entity.
         /// </summary>
         GET,
 
         /// <summary>
-        /// Represents an HTTP POST protocol method that is used to post a new entity as an addition to a URI.
+        /// Represents a HTTP protocol POST method. Commonly used to create a new entity.
         /// </summary>
         POST,
 
         /// <summary>
-        /// Represents an HTTP PUT protocol method that is used to post a new entity as an addition to a URI.
+        /// Represents a HTTP protocol PUT method. Commonly used to update an existing entity.
         /// </summary>
         PUT,
 
         /// <summary>
-        /// Represents an HTTP OPTIONS protocol method that is used to post a new entity as an addition to a URI.
+        /// Represents a HTTP protocol OPTIONS method. Commonly used to find out what methods the entity accepts.
         /// </summary>
         OPTIONS,
 
         /// <summary>
-        /// Represents an HTTP DELETE protocol method that is used to post a new entity as an addition to a URI.
+        /// Represents a HTTP protocol DELETE method. Commonly used to delete an existing entity.
         /// </summary>
         DELETE,
 
         /// <summary>
-        /// Represents an HTTP HEAD protocol method that is used to post a new entity as an addition to a URI.
+        /// Represents a HTTP protocol HEAD method. Commonly used to check whether an entity exists without obtaining the actual entity data.
         /// </summary>
         HEAD,
 
         /// <summary>
-        /// Represents an HTTP TRACE protocol method that is used to post a new entity as an addition to a URI.
+        /// Represents an HTTP protocol TRACE method.
         /// </summary>
         TRACE,
 
         /// <summary>
-        /// Represents an HTTP CONNECT protocol method that is used to post a new entity as an addition to a URI.
+        /// Represents an HTTP protocol CONNECT method.
         /// </summary>
         CONNECT,
 
         /// <summary>
-        /// Represents an HTTP PATH protocol method that is used to post a new entity as an addition to a URI.
+        /// Represents an HTTP protocol PATH method.
         /// </summary>
         PATH,
     }
