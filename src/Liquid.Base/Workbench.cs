@@ -13,12 +13,86 @@ namespace Liquid
     /// <summary>
     /// Provides a global way to configure a Liquid application.
     /// </summary>
+    [Obsolete("Please use the correct spelled class, Liquid.Base.Workbench")]
+    public static class WorkBench
+    {
+        public static ILightRepository Repository => Workbench.Instance.Repository;
+
+        public static ILightMediaStorage MediaStorage => Workbench.Instance.MediaStorage;
+
+        public static ILightTelemetry Telemetry => Workbench.Instance.Telemetry;
+
+        public static ILightCache Cache => Workbench.Instance.Cache;
+
+        public static ILightEvent Event => Workbench.Instance.Event;
+
+        public static ILightLogger Logger => Workbench.Instance.Logger;
+
+        public static IConfiguration Configuration => Workbench.Instance.Configuration;
+
+        public static ILightPolly Polly => Workbench.Instance.Polly;
+
+        public static void AddToCache(WorkBenchServiceType singletonType, IWorkBenchService singleton) => Workbench.Instance.AddToCache((WorkbenchServiceType)singletonType, (IWorkbenchService)singleton);
+
+        public static void UseMediaStorage<T>()
+            where T : ILightMediaStorage, new()
+            => Workbench.Instance.UseMediaStorage<T>();
+
+        public static void UseRepository<T>()
+            where T : ILightRepository, new()
+            => Workbench.Instance.UseRepository<T>();
+
+        public static void UseMessageBus<T>()
+            where T : ILightWorker, new()
+            => Workbench.Instance.UseMessageBus<T>();
+
+        public static void UseTelemetry<T>()
+            where T : ILightTelemetry, new()
+            => Workbench.Instance.UseTelemetry<T>();
+
+        public static void UseEnventHandler<T>()
+            where T : ILightEvent, new()
+            => Workbench.Instance.UseEventHandler<T>();
+
+        public static void UseCache<T>()
+            where T : ILightCache, new()
+            => Workbench.Instance.UseCache<T>();
+
+        public static void UseLogger<T>()
+            where T : ILightLogger, new()
+            => Workbench.Instance.UseLogger<T>();
+
+        public static object GetRegisteredService(WorkBenchServiceType serviceType)
+            => Workbench.Instance.GetRegisteredService((WorkbenchServiceType)serviceType);
+
+        /// <summary>
+        /// Prepare Workbench to start Unit Test.
+        /// </summary>
+        /// <param name="settingsFileName">Name of settings file in Unit Test Project in current directory.</param>
+        public static void PrepareUnitTestMode(string settingsFileName = "appsettings.json") => Workbench.Instance.PrepareUnitTestMode(settingsFileName);
+
+        /// <summary>
+        /// Initializes cartridges before run test.
+        /// </summary>
+        public static void RunUnitTestMode() => Workbench.Instance.RunUnitTestMode();
+
+        /// <summary>
+        /// Resets the service cache by removing all cached services.
+        /// </summary>
+        public static void Reset() => Workbench.Instance.Reset();
+    }
+
+    /// <summary>
+    /// Provides a global way to configure a Liquid application.
+    /// </summary>
     public class Workbench
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Workbench"/> class.
         /// </summary>
-        private Workbench() { }
+        private Workbench()
+        {
+        }
 
         /// <summary>
         /// Gets the singleton instance of <see cref="Workbench"/>.
@@ -198,77 +272,5 @@ namespace Liquid
             // Prevent initialization to run twice
             _isInitialized = true;
         }
-    }
-
-    /// <summary>
-    /// Provides a global way to configure a Liquid application.
-    /// </summary>
-    [Obsolete("Please use the correct spelled class, Liquid.Base.Workbench")]
-    public static class WorkBench
-    {
-        public static ILightRepository Repository => Workbench.Instance.Repository;
-
-        public static ILightMediaStorage MediaStorage => Workbench.Instance.MediaStorage;
-
-        public static ILightTelemetry Telemetry => Workbench.Instance.Telemetry;
-
-        public static ILightCache Cache => Workbench.Instance.Cache;
-
-        public static ILightEvent Event => Workbench.Instance.Event;
-
-        public static ILightLogger Logger => Workbench.Instance.Logger;
-
-        public static IConfiguration Configuration => Workbench.Instance.Configuration;
-
-        public static ILightPolly Polly => Workbench.Instance.Polly;
-
-        public static void AddToCache(WorkBenchServiceType singletonType, IWorkBenchService singleton) => Workbench.Instance.AddToCache((WorkbenchServiceType)singletonType, (IWorkbenchService)singleton);
-
-        public static void UseMediaStorage<T>()
-            where T : ILightMediaStorage, new()
-            => Workbench.Instance.UseMediaStorage<T>();
-
-        public static void UseRepository<T>()
-            where T : ILightRepository, new()
-            => Workbench.Instance.UseRepository<T>();
-
-        public static void UseMessageBus<T>()
-            where T : ILightWorker, new()
-            => Workbench.Instance.UseMessageBus<T>();
-
-        public static void UseTelemetry<T>()
-            where T : ILightTelemetry, new()
-            => Workbench.Instance.UseTelemetry<T>();
-
-        public static void UseEnventHandler<T>()
-            where T : ILightEvent, new()
-            => Workbench.Instance.UseEventHandler<T>();
-
-        public static void UseCache<T>()
-            where T : ILightCache, new()
-            => Workbench.Instance.UseCache<T>();
-
-        public static void UseLogger<T>()
-            where T : ILightLogger, new()
-            => Workbench.Instance.UseLogger<T>();
-
-        public static object GetRegisteredService(WorkBenchServiceType serviceType)
-            => Workbench.Instance.GetRegisteredService((WorkbenchServiceType)serviceType);
-
-        /// <summary>
-        /// Prepare Workbench to start Unit Test.
-        /// </summary>
-        /// <param name="settingsFileName">Name of settings file in Unit Test Project in current directory.</param>
-        public static void PrepareUnitTestMode(string settingsFileName = "appsettings.json") => Workbench.Instance.PrepareUnitTestMode(settingsFileName);
-
-        /// <summary>
-        /// Initializes cartridges before run test.
-        /// </summary>
-        public static void RunUnitTestMode() => Workbench.Instance.RunUnitTestMode();
-
-        /// <summary>
-        /// Resets the service cache by removing all cached services.
-        /// </summary>
-        public static void Reset() => Workbench.Instance.Reset();
     }
 }
