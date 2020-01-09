@@ -111,7 +111,7 @@ namespace Liquid.OnAzure
             SetContainerReference(_container);
 
             // If the MS has the configuration outside from the repository will be used this context and not inside
-            WorkBench.Repository.SetMediaStorage(this);
+            Workbench.Instance.Repository.SetMediaStorage(this);
         }
 
         /// <summary>
@@ -159,6 +159,11 @@ namespace Liquid.OnAzure
 
         public Task Remove(ILightAttachment attachment)
         {
+            if (attachment is null)
+            {
+                throw new ArgumentNullException(nameof(attachment));
+            }
+
             var targetFile = attachment.Id;
             var blockBlob = _containerReference.GetDirectoryReference(attachment.ResourceId).GetBlockBlobReference(targetFile);
             return blockBlob.DeleteIfExistsAsync();
@@ -191,9 +196,9 @@ namespace Liquid.OnAzure
             return CloudStorageAccount.Parse(Connection).CreateCloudBlobClient();
         }
 
-        private void SetContainerReference(string value)
+        private void SetContainerReference(string containerName)
         {
-            _containerReference = GetBlobClientFromConnection().GetContainerReference(value);
+            _containerReference = GetBlobClientFromConnection().GetContainerReference(containerName);
             _containerReference.CreateIfNotExistsAsync().Wait();
             _containerReference.SetPermissionsAsync(new BlobContainerPermissions
             {
