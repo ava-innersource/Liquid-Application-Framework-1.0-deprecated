@@ -131,7 +131,7 @@ namespace Liquid.Runtime
                  
                 if (context.Request.Path.Value.ToLower().Contains("/reseed"))
                 {
-                    WorkBench.Repository.ResetData(context.Request.Query["files"].ToString());
+                    Workbench.Instance.Repository.ResetData(context.Request.Query["files"].ToString());
 
                     context.Response.StatusCode = 200; // Succes
                     await context.Response.WriteAsync(string.Empty);

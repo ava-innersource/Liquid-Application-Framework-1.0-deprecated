@@ -40,9 +40,9 @@ namespace Liquid
         /// <param name="serviceType"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static HealthCheck CheckUp(WorkBenchServiceType serviceType, string value)
+        private static HealthCheck CheckUp(WorkbenchServiceType serviceType, string value)
         {
-            IWorkBenchHealthCheck workBenchHealCheck = GetService<IWorkBenchHealthCheck>(serviceType);
+            IWorkbenchHealthCheck workBenchHealCheck = GetService<IWorkbenchHealthCheck>(serviceType);
             string serviceKey = serviceType.ToString();
             var checkup = workBenchHealCheck.HealthCheck(serviceKey, value);
             return checkup;
@@ -54,12 +54,12 @@ namespace Liquid
         /// <returns></returns>
         private static void CheckActiveServices(LightHealthResult lightHealthResult)
         {
-            foreach (var keys in WorkBench._singletonCache.Keys)
+            foreach (var keys in Workbench.Instance._singletonCache.Keys)
             {
                 LightHealthCartridgeResult cartridgeResult = new LightHealthCartridgeResult();
                 cartridgeResult.Name = keys.ToString();
-                cartridgeResult.Status = CheckUp(keys, WorkBench._singletonCache[keys].ToString()).ToString();
-                lightHealthResult.CartridgesStatus.Add(cartridgeResult);                
+                cartridgeResult.Status = CheckUp(keys, Workbench.Instance._singletonCache[keys].ToString()).ToString();
+                lightHealthResult.CartridgesStatus.Add(cartridgeResult);
             }
         }
         
@@ -70,10 +70,10 @@ namespace Liquid
         /// <param name="singletonType"></param>
         /// <param name="mandatoryParam"></param>
         /// <returns></returns>
-        internal static T GetService<T>(WorkBenchServiceType singletonType, Boolean mandatoryParam = true)
+        internal static T GetService<T>(WorkbenchServiceType singletonType, Boolean mandatoryParam = true)
         {
-            IWorkBenchService service;
-            if (!WorkBench._singletonCache.TryGetValue(singletonType, out service))
+            IWorkbenchService service;
+            if (!Workbench.Instance._singletonCache.TryGetValue(singletonType, out service))
             {
                 if (mandatoryParam)
                     throw new ArgumentException($"No Workbench service of type '{singletonType.ToString()}' was injected on Startup.");
@@ -82,4 +82,4 @@ namespace Liquid
             return (T)service;
         }
     }
-} 
+}

@@ -23,7 +23,7 @@ namespace Liquid.OnAWS
         {
             _client = new AmazonS3Client(bucketRegion);
             _fileTransferUtility = new TransferUtility(_client);
-            WorkBench.Repository.SetMediaStorage(this);
+            Workbench.Instance.Repository.SetMediaStorage(this);
         }
 
         public async Task<ILightAttachment> GetAsync(string resourceId, string id)

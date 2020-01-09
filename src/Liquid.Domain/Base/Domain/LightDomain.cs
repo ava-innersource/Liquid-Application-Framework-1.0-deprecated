@@ -15,8 +15,8 @@ namespace Liquid.Base.Domain
         protected bool HasNotFoundError { get; set; }
         protected bool HasNotGenericReturn { get; set; }
         protected bool HasBadRequestError { get; set; }
-        protected ILightRepository Repository => WorkBench.Repository;
-        protected ILightMediaStorage MediaStorage => WorkBench.MediaStorage;
+        protected ILightRepository Repository => Workbench.Instance.Repository;
+        protected ILightMediaStorage MediaStorage => Workbench.Instance.MediaStorage;
         public ILightTelemetry Telemetry { get; set; }
         public ILightContext Context { get; set; }
         public ILightCache Cache { get; set; }

@@ -73,7 +73,7 @@ namespace Liquid.OnWindowsClient
             {
                 Exception moreInfo = new Exception($"Error setting up queue consumption from service bus. See inner exception for details. Message={exception.Message}", exception);
                 //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-                ((LightTelemetry)WorkBench.Telemetry).TrackException(moreInfo);
+                ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(moreInfo);
             }
         }
 
@@ -100,7 +100,7 @@ namespace Liquid.OnWindowsClient
             {
                 Exception moreInfo = new Exception($"Error setting up subscription consumption from service bus. See inner exception for details. Message={exception.Message}", exception);
                 //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-                ((LightTelemetry)WorkBench.Telemetry).TrackException(moreInfo);
+                ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(moreInfo);
             }
         }
 

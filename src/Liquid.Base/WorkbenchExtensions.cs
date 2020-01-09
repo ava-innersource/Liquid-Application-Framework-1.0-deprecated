@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace Liquid
 {
-    public static class WorkBenchExtensions
+    public static class WorkbenchExtensions
     {
         public static object CloneService (this object objSource)
         {

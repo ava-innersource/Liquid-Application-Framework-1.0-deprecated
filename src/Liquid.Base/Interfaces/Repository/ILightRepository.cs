@@ -12,7 +12,7 @@ namespace Liquid.Interfaces
     /// <summary>
     /// Public interface for all NoSql Database Implementations
     /// </summary>
-    public interface ILightRepository : IWorkBenchHealthCheck
+    public interface ILightRepository : IWorkbenchHealthCheck
     {
 
         void SetMediaStorage(ILightMediaStorage mediaStorage);        

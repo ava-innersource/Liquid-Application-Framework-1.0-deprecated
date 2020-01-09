@@ -321,7 +321,7 @@ namespace Liquid.OnAzure
                 }
                 catch (Exception exRegister)
                 {
-                    ((LightTelemetry)WorkBench.Telemetry).TrackException(exRegister);
+                    ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(exRegister);
                     errorEntities.Add(model);
                 }
             }

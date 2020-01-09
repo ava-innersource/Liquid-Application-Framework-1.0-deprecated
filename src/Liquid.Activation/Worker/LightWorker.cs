@@ -25,8 +25,8 @@ namespace Liquid.Activation
         protected readonly static Dictionary<MethodInfo, QueueAttribute> _queues = new Dictionary<MethodInfo, QueueAttribute>();
         protected readonly static Dictionary<MethodInfo, TopicAttribute> _topics = new Dictionary<MethodInfo, TopicAttribute>();
         private readonly List<string> _inputValidationErrors = new List<string>();
-        protected ILightTelemetry Telemetry { get; } = WorkBench.Telemetry != null ? (ILightTelemetry)WorkBench.Telemetry.CloneService() : null;
-        protected ILightCache Cache => WorkBench.Cache;
+        protected ILightTelemetry Telemetry { get; } = Workbench.Instance.Telemetry != null ? (ILightTelemetry)Workbench.Instance.Telemetry.CloneService() : null;
+        protected ILightCache Cache => Workbench.Instance.Cache;
         //Instance of CriticHandler to inject on the others classes
         private readonly CriticHandler _criticHandler = new CriticHandler();
 

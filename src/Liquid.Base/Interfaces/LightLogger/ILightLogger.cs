@@ -6,7 +6,7 @@ namespace Liquid.Interfaces
     /// <summary>
     /// Interface Logger inheritance to use a liquid framework
     /// </summary> 
-    public interface ILightLogger : IWorkBenchHealthCheck
+    public interface ILightLogger : IWorkbenchHealthCheck
     {
         /// <summary>
         /// LogTrafic

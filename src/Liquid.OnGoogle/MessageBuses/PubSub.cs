@@ -17,7 +17,7 @@ namespace Liquid.OnGoogle
     /// <summary>
     /// Implementation of the communication component between queues of the Google, this class is specific to google
     /// </summary>
-    public class PubSub : LightWorker, IWorkBenchHealthCheck
+    public class PubSub : LightWorker, IWorkbenchHealthCheck
     {
         private  SubscriberClient subscriberClient;
         private  SubscriptionName _subscriptionName;
@@ -70,7 +70,7 @@ namespace Liquid.OnGoogle
                     this.subscriberClient = SubscriberClient.CreateAsync(_subscriptionName).Result;
 
                     //Register Trace on the telemetry 
-                    WorkBench.Telemetry.TrackTrace($"Topic {topicName} registered");
+                    Workbench.Instance.Telemetry.TrackTrace($"Topic {topicName} registered");
 
                     subscriberClient.StartAsync(async (PubsubMessage message, CancellationToken cancel) => {
 
@@ -78,17 +78,17 @@ namespace Liquid.OnGoogle
                         {
                             string text = Encoding.UTF8.GetString(message.Data.ToArray());
 
-                            WorkBench.Telemetry.TrackEvent("Method invoked");
+                            Workbench.Instance.Telemetry.TrackEvent("Method invoked");
                             //Use of the Metrics to monitoring the queue's processes, start the metric
-                            WorkBench.Telemetry.BeginMetricComputation("MessageProcessed");
+                            Workbench.Instance.Telemetry.BeginMetricComputation("MessageProcessed");
                             //Processing the method defined with queue
                             InvokeProcess(method, Encoding.UTF8.GetBytes(text));
-                            WorkBench.Telemetry.ComputeMetric("MessageProcessed", 1);
+                            Workbench.Instance.Telemetry.ComputeMetric("MessageProcessed", 1);
                             //Finish the monitoring the queue's processes 
-                            WorkBench.Telemetry.EndMetricComputation("MessageProcessed");
+                            Workbench.Instance.Telemetry.EndMetricComputation("MessageProcessed");
 
-                            WorkBench.Telemetry.TrackEvent("Method terminated");
-                            WorkBench.Telemetry.TrackEvent("Queue's message completed");
+                            Workbench.Instance.Telemetry.TrackEvent("Method terminated");
+                            Workbench.Instance.Telemetry.TrackEvent("Queue's message completed");
 
                             return await Task.FromResult<SubscriberClient.Reply>(SubscriberClient.Reply.Ack);
 
@@ -96,7 +96,7 @@ namespace Liquid.OnGoogle
                         catch (Exception exRegister)
                         {
                             //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-                            ((LightTelemetry)WorkBench.Telemetry).TrackException(exRegister);
+                            ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(exRegister);
 
                             return await Task.FromResult<SubscriberClient.Reply>(SubscriberClient.Reply.Nack);
                         }                      
@@ -108,7 +108,7 @@ namespace Liquid.OnGoogle
             catch (Exception exception)
             {
                 //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-                ((LightTelemetry)WorkBench.Telemetry).TrackException(exception);
+                ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(exception);
             }
         }
 

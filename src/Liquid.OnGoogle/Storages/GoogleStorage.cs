@@ -24,7 +24,7 @@ namespace Liquid.OnGoogle
             _client = StorageClient.Create(credential);
             // Make an authenticated API request. 
             _bucket = _client.CreateBucket(this.Conection, this.Container);
-            WorkBench.Repository.SetMediaStorage(this);
+            Workbench.Instance.Repository.SetMediaStorage(this);
         }
 
         public async Task<ILightAttachment> GetAsync(string resourceId, string id)
