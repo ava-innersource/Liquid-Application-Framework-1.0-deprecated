@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,9 @@ using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using Liquid.Interfaces;
 using Liquid.Repository;
+using Liquid.Tests;
 using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using NSubstitute;
 using Xunit;
 
@@ -89,6 +92,12 @@ namespace Liquid.OnAzure.Tests
         }
 
         [Fact]
+        public async Task RemoveThrowsIfAttachmentIsNullAsync()
+        {
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => await _sut.Remove(null));
+        }
+
+        [Fact]
         public async Task WhenResourceRemovedCantGet()
         {
             await _sut.InsertUpdateAsync(_lightAttachment);
@@ -101,6 +110,39 @@ namespace Liquid.OnAzure.Tests
             await _sut.Remove(_lightAttachment);
 
             await Assert.ThrowsAnyAsync<StorageException>(() => _sut.GetAsync(_lightAttachment.ResourceId, _lightAttachment.Id));
+        }
+
+        [Theory]
+        [AutoSubstituteData]
+        public async Task CreatesContainerOnInitializationWithDesiredAccessLevelAsync(BlobContainerPublicAccessType accessType)
+        {
+            // ARRANGE
+            const string containerName = "removecontainer";
+            var connectionString = "UseDevelopmentStorage=true";
+
+            var client = CloudStorageAccount.Parse(connectionString).CreateCloudBlobClient();
+            var container = client.GetContainerReference(containerName);
+
+            await container.DeleteIfExistsAsync();
+
+            var configuration = new MediaStorageConfiguration
+            {
+                ConnectionString = connectionString,
+                Container = containerName,
+                Permission = accessType.ToString(),
+            };
+
+            // ACT
+            _ = new AzureBlob(configuration);
+
+            // ASSERT
+            container = client.GetContainerReference(containerName);
+
+            Assert.True(await container.ExistsAsync());
+
+            var blobContainerPermissions = await container.GetPermissionsAsync();
+
+            Assert.Equal(accessType, blobContainerPermissions.PublicAccess);
         }
 
         public void Dispose()
