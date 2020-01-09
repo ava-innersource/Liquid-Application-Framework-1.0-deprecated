@@ -493,14 +493,14 @@ namespace Liquid.Repository
         {
             try
             {
-                LightEvent Event = (LightEvent)WorkBench.GetRegisteredService(WorkBenchServiceType.EventHandler);
+                LightEvent Event = (LightEvent)Workbench.Instance.GetRegisteredService(WorkbenchServiceType.EventHandler);
 
                 if (Event != null)
                     Event.SendToHub(model, dataOperation);
             }
             catch (Exception exRegister)
             {
-                ((LightTelemetry)WorkBench.Telemetry).TrackException(exRegister);
+                ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(exRegister);
             }
 
             return Task.FromResult<T>(default(T));

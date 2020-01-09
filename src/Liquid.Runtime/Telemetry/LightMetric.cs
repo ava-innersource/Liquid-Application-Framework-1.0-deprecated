@@ -12,7 +12,7 @@ namespace Liquid.Runtime.Telemetry
     {
         private LightMetricAggregator _aggregator = null;
         ///Get Reference for send to the AppInsights.
-        private readonly LightTelemetry _telemetry = (LightTelemetry)WorkBench.Telemetry;
+        private readonly LightTelemetry _telemetry = (LightTelemetry)Workbench.Instance.Telemetry;
         ///Metric's name. In this case, differents class can be the same name for the metric.
         public string Name { get; }
         ///Constructor responsible for picking up the metric name and instantiating a LightMetricAggregator.

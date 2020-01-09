@@ -19,7 +19,7 @@ namespace Liquid.Activation
     {
         protected readonly static Dictionary<TypeInfo, HubAttribute> _eventCache = new Dictionary<TypeInfo, HubAttribute>();
         //Cloning TLightelemetry service singleton because it services multiple LightDomain instances from multiple threads with instance variables
-        private readonly ILightTelemetry _telemetry = WorkBench.Telemetry != null ? (ILightTelemetry)WorkBench.Telemetry.CloneService() : null;
+        private readonly ILightTelemetry _telemetry = Workbench.Instance.Telemetry != null ? (ILightTelemetry)Workbench.Instance.Telemetry.CloneService() : null;
         protected ILightTelemetry Telemetry => _telemetry;
 
 

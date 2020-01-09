@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Copyright (c) Avanade Inc. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
 
 namespace Liquid.Base.Interfaces
 {
-    public interface IWorkBenchHealthCheck : IWorkBenchService
+    /// <summary>
+    /// Interface created to force cartridges to implement the method for it's HealthCheck
+    /// </summary>
+    public interface IWorkbenchHealthCheck : IWorkbenchService
     {
         /// <summary>
         /// Interface created to force cartridges to implement the method for it's HealthCheck

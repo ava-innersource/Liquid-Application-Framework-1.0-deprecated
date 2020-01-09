@@ -21,7 +21,7 @@ namespace Liquid.Runtime.Configuration.Base
         public static T Config<T>(string section) where T : LightConfig<T>
         {
             /// Load given section from Workbench
-            var config = WorkBench.Configuration.GetSection(section).Get<T>();
+            var config = Workbench.Instance.Configuration.GetSection(section).Get<T>();
 
             if (config == null)
             {

@@ -59,9 +59,9 @@ namespace Liquid.OnAzure
             this.Container = mediaStorageConfiguration.Container;
 
             // If the MS has the configuration outside from the repository will be used this context and not inside
-            if (WorkBench.Repository != null)
+            if (Workbench.Instance.Repository != null)
             {
-                WorkBench.Repository.SetMediaStorage(this);
+                Workbench.Instance.Repository.SetMediaStorage(this);
             }
         }
 

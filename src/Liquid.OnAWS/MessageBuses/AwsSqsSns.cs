@@ -17,7 +17,7 @@ namespace Liquid.OnAWS
     /// <summary>
     /// Implementation of the communication component between queues and topics of the Azure, this class is specific to azure
     /// </summary>
-    public class AwsSqsSns : LightWorker, IWorkBenchHealthCheck
+    public class AwsSqsSns : LightWorker, IWorkbenchHealthCheck
     {
         /// <summary>
         /// Implementation of the start process queue and process topic. It must be called  parent before start processes.
@@ -65,7 +65,7 @@ namespace Liquid.OnAWS
                     int takeQuantity = queue.Value.TakeQuantity;
 
                     //Register Trace on the telemetry 
-                    WorkBench.Telemetry.TrackTrace($"Queue {queueName} registered");
+                    Workbench.Instance.Telemetry.TrackTrace($"Queue {queueName} registered");
                     AmazonSQSClient sqsClient = new AmazonSQSClient(config.AwsAccessKeyId, config.AwsSecretAccessKey);
                     string queueURL = sqsClient.CreateQueueAsync(new CreateQueueRequest
                     {
@@ -84,22 +84,22 @@ namespace Liquid.OnAWS
                     {
                         try
                         {
-                            WorkBench.Telemetry.TrackEvent("Method invoked");
+                            Workbench.Instance.Telemetry.TrackEvent("Method invoked");
                             //Use of the Metrics to monitoring the queue's processes, start the metric
-                            WorkBench.Telemetry.BeginMetricComputation("MessageProcessed");
+                            Workbench.Instance.Telemetry.BeginMetricComputation("MessageProcessed");
                             //Processing the method defined with queue
                             InvokeProcess(method, Encoding.UTF8.GetBytes(message.Body));
-                            WorkBench.Telemetry.ComputeMetric("MessageProcessed", 1);
+                            Workbench.Instance.Telemetry.ComputeMetric("MessageProcessed", 1);
                             //Finish the monitoring the queue's processes 
-                            WorkBench.Telemetry.EndMetricComputation("MessageProcessed");
+                            Workbench.Instance.Telemetry.EndMetricComputation("MessageProcessed");
 
-                            WorkBench.Telemetry.TrackEvent("Method terminated");
-                            WorkBench.Telemetry.TrackEvent("Queue's message completed");
+                            Workbench.Instance.Telemetry.TrackEvent("Method terminated");
+                            Workbench.Instance.Telemetry.TrackEvent("Queue's message completed");
                         }
                         catch (Exception exRegister)
                         {
                             //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-                            ((LightTelemetry)WorkBench.Telemetry).TrackException(exRegister);
+                            ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(exRegister);
                         }
                     }
                 }
@@ -107,7 +107,7 @@ namespace Liquid.OnAWS
             catch (Exception exception)
             {
                 //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-                ((LightTelemetry)WorkBench.Telemetry).TrackException(exception);
+                ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(exception);
             }
         }
         /// <summary>
@@ -126,7 +126,7 @@ namespace Liquid.OnAWS
                     string subscriptName = topic.Value.Subscription;
 
                     //Register Trace on the telemetry 
-                    WorkBench.Telemetry.TrackTrace($"Topic {topicName} registered");
+                    Workbench.Instance.Telemetry.TrackTrace($"Topic {topicName} registered");
                     AmazonSimpleNotificationServiceClient snsClient = new AmazonSimpleNotificationServiceClient(config.AwsAccessKeyId, config.AwsSecretAccessKey); 
                     var topicRequest = new CreateTopicRequest
                     {
@@ -143,22 +143,22 @@ namespace Liquid.OnAWS
                     {
                         try
                         {
-                            WorkBench.Telemetry.TrackEvent("Method invoked");
+                            Workbench.Instance.Telemetry.TrackEvent("Method invoked");
                             //Use of the Metrics to monitoring the queue's processes, start the metric
-                            WorkBench.Telemetry.BeginMetricComputation("MessageProcessed");
+                            Workbench.Instance.Telemetry.BeginMetricComputation("MessageProcessed");
                             //Processing the method defined with queue
                             InvokeProcess(method, Encoding.UTF8.GetBytes(subscription.SubscriptionArn));
-                            WorkBench.Telemetry.ComputeMetric("MessageProcessed", 1);
+                            Workbench.Instance.Telemetry.ComputeMetric("MessageProcessed", 1);
                             //Finish the monitoring the queue's processes 
-                            WorkBench.Telemetry.EndMetricComputation("MessageProcessed");
+                            Workbench.Instance.Telemetry.EndMetricComputation("MessageProcessed");
 
-                            WorkBench.Telemetry.TrackEvent("Method terminated");
-                            WorkBench.Telemetry.TrackEvent("Queue's message completed");
+                            Workbench.Instance.Telemetry.TrackEvent("Method terminated");
+                            Workbench.Instance.Telemetry.TrackEvent("Queue's message completed");
                         }
                         catch (Exception exRegister)
                         {
                             //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-                            ((LightTelemetry)WorkBench.Telemetry).TrackException(exRegister);
+                            ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(exRegister);
                         }
                     }
                 }
@@ -166,7 +166,7 @@ namespace Liquid.OnAWS
             catch (Exception exception)
             {
                 //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-                ((LightTelemetry)WorkBench.Telemetry).TrackException(exception);
+                ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(exception);
             }
         }
         protected override Task ProcessAsync()

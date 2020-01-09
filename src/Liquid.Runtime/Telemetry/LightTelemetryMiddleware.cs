@@ -24,7 +24,7 @@ namespace Liquid.Runtime.Telemetry
         public static void AddTelemetry(IServiceCollection services)
         {
             // TODO: use typed configuration
-            var applicationInsightsSection = WorkBench.Configuration.GetSection("ApplicationInsights");
+            var applicationInsightsSection = Workbench.Instance.Configuration.GetSection("ApplicationInsights");
 
             if (applicationInsightsSection == null) return;
 
@@ -99,7 +99,7 @@ namespace Liquid.Runtime.Telemetry
             }
             catch (Exception e)
             {
-                ((LightTelemetry)WorkBench.Telemetry).TrackException(e);
+                ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(e);
                 throw;
             }
         }

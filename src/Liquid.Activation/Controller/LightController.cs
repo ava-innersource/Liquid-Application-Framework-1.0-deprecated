@@ -20,10 +20,10 @@ namespace Liquid.Activation
         protected LightContext _context;
         private readonly List<string> _inputValidationErrors = new List<string>();
         //Cloning TLightelemetry service singleton because it services multiple LightDomain instances from multiple threads with instance variables
-        private readonly ILightTelemetry _telemetry = WorkBench.Telemetry != null ? (ILightTelemetry)WorkBench.Telemetry.CloneService() : null;
+        private readonly ILightTelemetry _telemetry = Workbench.Instance.Telemetry != null ? (ILightTelemetry)Workbench.Instance.Telemetry.CloneService() : null;
         protected ILightTelemetry Telemetry => _telemetry;
-        protected ILightLogger Logger => WorkBench.Logger;
-        protected ILightCache Cache => WorkBench.Cache;
+        protected ILightLogger Logger => Workbench.Instance.Logger;
+        protected ILightCache Cache => Workbench.Instance.Cache;
         //Instance of CriticHandler to inject on the others classes
         private readonly CriticHandler _criticHandler = new CriticHandler();
         public IHttpContextAccessor _httpContextAccessor;

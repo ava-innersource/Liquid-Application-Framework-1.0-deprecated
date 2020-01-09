@@ -16,7 +16,7 @@ namespace Liquid.OnAzure
     /// <summary>
     /// Implementation of the communication component between queues and topics of the Azure, this class is specific to azure
     /// </summary>
-    public class ServiceBus : LightWorker, IWorkBenchHealthCheck
+    public class ServiceBus : LightWorker, IWorkbenchHealthCheck
     {
         /// <summary>
         /// Implementation of the start process queue and process topic. It must be called  parent before start processes.
@@ -60,7 +60,7 @@ namespace Liquid.OnAzure
         public Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
         {
             //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-            ((LightTelemetry)WorkBench.Telemetry).TrackException(exceptionReceivedEventArgs.Exception);
+            ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(exceptionReceivedEventArgs.Exception);
             return Task.CompletedTask;
         }
 
@@ -96,7 +96,7 @@ namespace Liquid.OnAzure
                             {
                                 Exception moreInfo = new Exception($"Exception reading message from queue {queueName}. See inner exception for details. Message={exRegister.Message}", exRegister);
                                 //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-                                ((LightTelemetry)WorkBench.Telemetry).TrackException(moreInfo);
+                                ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(moreInfo);
 
                                 //If there is a error , set DeadLetter on register
                                 if (queueReceiver.ReceiveMode == ReceiveMode.PeekLock)
@@ -114,7 +114,7 @@ namespace Liquid.OnAzure
             {
                 Exception moreInfo = new Exception($"Error setting up queue consumption from service bus. See inner exception for details. Message={exception.Message}", exception);
                 //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-                ((LightTelemetry)WorkBench.Telemetry).TrackException(moreInfo);
+                ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(moreInfo);
             }
         }
 
@@ -155,7 +155,7 @@ namespace Liquid.OnAzure
                             {
                                 Exception moreInfo = new Exception($"Exception reading message from topic {topicName} and subscriptName {subscriptName}. See inner exception for details. Message={exRegister.Message}", exRegister);
                                 //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-                                ((LightTelemetry)WorkBench.Telemetry).TrackException(moreInfo);
+                                ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(moreInfo);
 
                                 var exceptionDetails = $"{exRegister.Message}";
 
@@ -200,7 +200,7 @@ namespace Liquid.OnAzure
             {
                 Exception moreInfo = new Exception($"Error setting up subscription consumption from service bus. See inner exception for details. Message={exception.Message}", exception);
                 //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-                ((LightTelemetry)WorkBench.Telemetry).TrackException(moreInfo);
+                ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(moreInfo);
             }
         }
 

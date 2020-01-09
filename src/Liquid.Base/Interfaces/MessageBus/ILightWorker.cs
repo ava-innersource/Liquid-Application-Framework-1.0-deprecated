@@ -5,7 +5,7 @@ namespace Liquid.Interfaces
     /// <summary>
     /// Inteface to LightWorker controller
     /// </summary>
-    public interface ILightWorker : IWorkBenchService
+    public interface ILightWorker : IWorkbenchService
     {
 
     }

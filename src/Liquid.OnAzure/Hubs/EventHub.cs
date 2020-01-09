@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Liquid.OnAzure.Hubs
 {
-    public class EventHub : LightWorker, IWorkBenchHealthCheck
+    public class EventHub : LightWorker, IWorkbenchHealthCheck
     {
 
         HubConfiguration config = null;
@@ -58,7 +58,7 @@ namespace Liquid.OnAzure.Hubs
         public Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
         {
             //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-            ((LightTelemetry)WorkBench.Telemetry).TrackException(exceptionReceivedEventArgs.Exception);
+            ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(exceptionReceivedEventArgs.Exception);
             return Task.CompletedTask;
         }
 
@@ -104,7 +104,7 @@ namespace Liquid.OnAzure.Hubs
                 Exception moreInfo = new Exception($"Exception reading topic={topic.Value.TopicName} with subscription={topic.Value.Subscription} from event hub. See inner exception for details. Message={exception.Message}", exception);
 
                 //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-                ((LightTelemetry)WorkBench.Telemetry).TrackException(moreInfo);
+                ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(moreInfo);
             }
         }
 
