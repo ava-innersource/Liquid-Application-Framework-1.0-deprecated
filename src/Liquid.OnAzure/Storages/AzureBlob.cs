@@ -124,8 +124,6 @@ namespace Liquid.OnAzure
         /// <returns>The attachment that was obtained from the underlying storage.</returns>
         public async Task<ILightAttachment> GetAsync(string resourceId, string id)
         {
-            //var blob = _containerReference.GetBlobReference(resourceId + "/" + id);
-
             var blob = _containerReference.GetDirectoryReference(resourceId).GetBlockBlobReference(id);
 
             var stream = new MemoryStream();

@@ -85,10 +85,12 @@ namespace Liquid.OnAzure.Tests
         {
             await _sut.InsertUpdateAsync(_lightAttachment);
 
-            var attachment = await _sut.GetAsync(_lightAttachment.ResourceId, _lightAttachment.Id);
-            var actual = attachment.MediaStream.AsString();
+            using (var attachment = await _sut.GetAsync(_lightAttachment.ResourceId, _lightAttachment.Id))
+            {
+                var actual = attachment.MediaStream.AsString();
 
-            Assert.Equal(_expectedData, actual);
+                Assert.Equal(_expectedData, actual);
+            }
         }
 
         [Fact]
@@ -102,14 +104,16 @@ namespace Liquid.OnAzure.Tests
         {
             await _sut.InsertUpdateAsync(_lightAttachment);
 
-            var attachment = await _sut.GetAsync(_lightAttachment.ResourceId, _lightAttachment.Id);
-            var actual = attachment.MediaStream.AsString();
+            using (var attachment = await _sut.GetAsync(_lightAttachment.ResourceId, _lightAttachment.Id))
+            {
+                var actual = attachment.MediaStream.AsString();
 
-            Assert.Equal(_expectedData, actual);
+                Assert.Equal(_expectedData, actual);
 
-            await _sut.Remove(_lightAttachment);
+                await _sut.Remove(_lightAttachment);
 
-            await Assert.ThrowsAnyAsync<StorageException>(() => _sut.GetAsync(_lightAttachment.ResourceId, _lightAttachment.Id));
+                await Assert.ThrowsAnyAsync<StorageException>(() => _sut.GetAsync(_lightAttachment.ResourceId, _lightAttachment.Id));
+            }
         }
 
         [Theory]
