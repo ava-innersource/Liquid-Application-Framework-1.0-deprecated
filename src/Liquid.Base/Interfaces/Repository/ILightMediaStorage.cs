@@ -13,13 +13,13 @@ namespace Liquid.Interfaces
     public interface ILightMediaStorage : IWorkbenchHealthCheck
     {
         /// <summary>
-        /// The connection string for the storage provider.
+        /// Gets or sets the connection string for the storage provider.
         /// </summary>
         [Obsolete("This property will be removed in later version. Please refrain from accessing it.")]
         string Connection { get; set; }
 
         /// <summary>
-        /// The container name used to store data in the provider.
+        /// Gets or sets the container name used to store data in the provider.
         /// </summary>
         [Obsolete("This property will be removed in later version. Please refrain from accessing it.")]
         string Container { get; set; }

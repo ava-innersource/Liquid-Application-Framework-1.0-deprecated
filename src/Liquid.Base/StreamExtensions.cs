@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Avanade Inc. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +17,6 @@ namespace Liquid
         /// Read the stream to the end and converts it to an UTF8 string.
         /// </summary>
         /// <param name="stream">The stream that will be read to the end.</param>
-        /// <param name="encoding">The encoding of the string in the stream.</param>
         /// <returns>The contents of the stream read as a string.</returns>
         public static string AsString(this Stream stream) => AsString(stream, Encoding.UTF8);
 
@@ -46,10 +48,8 @@ namespace Liquid
         /// Read the stream to the end and converts it to an UTF8 string asynchronously.
         /// </summary>
         /// <param name="stream">The stream that will be read to the end.</param>
-        /// <param name="encoding">The encoding of the string in the stream.</param>
         /// <returns>Task containg the result of the conversion from stream to string.</returns>
         public static Task<string> AsStringAsync(this Stream stream) => AsStringAsync(stream, Encoding.UTF8);
-
 
         /// <summary>
         /// Read the stream to the end and converts it to a string accordingly to the desired encoding asynchronously.
@@ -57,7 +57,7 @@ namespace Liquid
         /// <param name="stream">The stream that will be read to the end.</param>
         /// <param name="encoding">The encoding of the string in the stream.</param>
         /// <returns>Task containg the result of the conversion from stream to string.</returns>
-        public static async Task<string> AsStringAsync(this Stream stream, Encoding encoding)
+        public static Task<string> AsStringAsync(this Stream stream, Encoding encoding)
         {
             if (stream is null)
             {
@@ -71,7 +71,7 @@ namespace Liquid
 
             using (var reader = new StreamReader(stream, encoding))
             {
-                return await reader.ReadToEndAsync();
+                return reader.ReadToEndAsync();
             }
         }
     }

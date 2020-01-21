@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace Liquid.OnAzure
 {
-
     /// <summary>
     /// Cartridge for Azure Blob
     /// </summary>
@@ -31,7 +30,7 @@ namespace Liquid.OnAzure
         private string _connection; // please don't remove - we will remove the property later
 
         /// <summary>
-        /// Permission to be applied to newly created containers
+        /// Permission to be applied to newly created containers.
         /// </summary>
         private string _permission; // please don't remove - we will remove the property later
 
@@ -42,7 +41,7 @@ namespace Liquid.OnAzure
         public string Connection { get => _connection; set => _connection = value; }
 
         /// <summary>
-        /// Permission to be applied to newly created containers
+        /// Permission to be applied to newly created containers.
         /// </summary>
         [Obsolete("This property will be removed in later version. Please refrain from accessing it.")]
         public string Permission { get => _permission; set => _permission = value; }
@@ -143,7 +142,7 @@ namespace Liquid.OnAzure
             };
         }
 
-        public async Task InsertUpdateAsync(ILightAttachment attachment)
+        public Task InsertUpdateAsync(ILightAttachment attachment)
         {
             if (attachment is null)
             {
@@ -154,7 +153,7 @@ namespace Liquid.OnAzure
 
             blockBlob.Properties.ContentType = attachment.ContentType;
 
-            await blockBlob.UploadFromStreamAsync(attachment.MediaStream, attachment.MediaStream.Length);
+            return blockBlob.UploadFromStreamAsync(attachment.MediaStream, attachment.MediaStream.Length);
         }
 
         public Task Remove(ILightAttachment attachment)
@@ -193,22 +192,21 @@ namespace Liquid.OnAzure
 
         private CloudBlobClient GetBlobClientFromConnection()
         {
-            return CloudStorageAccount.Parse(Connection).CreateCloudBlobClient();
+            return CloudStorageAccount.Parse(_connection).CreateCloudBlobClient();
         }
 
         private void SetContainerReference(string containerName)
         {
             _containerReference = GetBlobClientFromConnection().GetContainerReference(containerName);
-            _containerReference.CreateIfNotExistsAsync().Wait();
+            _containerReference.CreateIfNotExistsAsync().GetAwaiter().GetResult();
             _containerReference.SetPermissionsAsync(new BlobContainerPermissions
             {
-                PublicAccess = !string.IsNullOrEmpty(Permission) ?
-                    (Permission.Equals("Blob") ? BlobContainerPublicAccessType.Blob :
-                    (Permission.Equals("Off") ? BlobContainerPublicAccessType.Off :
-                    (Permission.Equals("Container") ? BlobContainerPublicAccessType.Container :
-                    (Permission.Equals("Unknown") ? BlobContainerPublicAccessType.Unknown : BlobContainerPublicAccessType.Blob)))) : BlobContainerPublicAccessType.Blob
-            }).Wait();
+                PublicAccess = !string.IsNullOrEmpty(_permission) ?
+                    (_permission.Equals("Blob") ? BlobContainerPublicAccessType.Blob :
+                    (_permission.Equals("Off") ? BlobContainerPublicAccessType.Off :
+                    (_permission.Equals("Container") ? BlobContainerPublicAccessType.Container :
+                    (_permission.Equals("Unknown") ? BlobContainerPublicAccessType.Unknown : BlobContainerPublicAccessType.Blob)))) : BlobContainerPublicAccessType.Blob
+            }).GetAwaiter().GetResult();
         }
-
     }
 }
