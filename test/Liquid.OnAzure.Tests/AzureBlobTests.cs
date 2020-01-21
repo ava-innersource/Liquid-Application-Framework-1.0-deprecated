@@ -145,6 +145,39 @@ namespace Liquid.OnAzure.Tests
             Assert.Equal(accessType, blobContainerPermissions.PublicAccess);
         }
 
+        [Fact]
+        public void HealthCheckReturnsHealthyWhenServiceIsOnline()
+        {
+            var actual = _sut.HealthCheck(null, null);
+
+            Assert.Equal(LightHealth.HealthCheck.Healthy, actual);
+        }
+
+        [Fact]
+        public async Task HealthCheckReturnsUnhealthyWhenContainerDoesntExists()
+        {
+            // ARRANGE
+            const string containerName = "healthy";
+            var connectionString = "UseDevelopmentStorage=true";
+
+            var sut = new AzureBlob(new MediaStorageConfiguration
+            {
+                ConnectionString = connectionString,
+                Container = containerName,
+            });
+
+            var client = CloudStorageAccount.Parse(connectionString).CreateCloudBlobClient();
+            var containerReference = client.GetContainerReference(containerName);
+
+            await containerReference.DeleteAsync();
+
+            // ACT
+            var actual = sut.HealthCheck(null, null);
+
+            // ASSERT
+            Assert.Equal(LightHealth.HealthCheck.Unhealthy, actual);
+        }
+
         public void Dispose()
         {
             Dispose(true);

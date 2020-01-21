@@ -1,9 +1,10 @@
 using Liquid.Interfaces;
 using Liquid.Repository;
 using Liquid.Runtime.Configuration.Base;
-using Microsoft.WindowsAzure.Storage; 
-using Microsoft.WindowsAzure.Storage.Blob; 
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -33,6 +34,7 @@ namespace Liquid.OnAzure
         /// Permission to be applied to newly created containers.
         /// </summary>
         private string _permission; // please don't remove - we will remove the property later
+        private readonly ILightTelemetry _telemetry;
 
         /// <summary>
         /// The connection string for the storage provider.
@@ -78,6 +80,22 @@ namespace Liquid.OnAzure
             {
                 throw new ArgumentNullException(nameof(configuration));
             }
+
+            Initialize(configuration);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="AzureBlob"/>.
+        /// </summary>
+        /// <param name="configuration">The configuration for this class.</param>
+        public AzureBlob(MediaStorageConfiguration configuration, ILightTelemetry telemetry)
+        {
+            if (configuration is null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
+
+            _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry));
 
             Initialize(configuration);
         }
@@ -168,24 +186,32 @@ namespace Liquid.OnAzure
             return blockBlob.DeleteIfExistsAsync();
         }
 
+
         /// <summary>
-        /// Method to run Health Check for AzureBlob Media Storage
+        /// Checks if the container exists. Will return unhealthy when the container doens't exists
+        /// or if there's a connection problem with the Azure Blob Storage.
         /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
+        /// <returns>
+        /// LightHealth.HealthCheck.Healthy when the container exists and can be connected to.
+        /// </returns>
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Any exception is treated as unhealthy and shouldn't be returned to the caller.")]
+        public LightHealth.HealthCheck HealthCheck(string _1, string _2)
         {
             try
             {
-                TimeSpan span = new TimeSpan(0, 0, 1);
-                _containerReference.AcquireLeaseAsync(span);
-                _containerReference.BreakLeaseAsync(span);
+                var exists = _containerReference.ExistsAsync().GetAwaiter().GetResult();
+
+                if (!exists)
+                {
+                    throw new Exception($"Container '{_container}' doesn't exists");
+                }
+
                 return LightHealth.HealthCheck.Healthy;
             }
-            catch
+            catch (Exception e)
             {
-                // TODO: Track exception
+                _telemetry?.TrackException(e);
+
                 return LightHealth.HealthCheck.Unhealthy;
             }
         }
