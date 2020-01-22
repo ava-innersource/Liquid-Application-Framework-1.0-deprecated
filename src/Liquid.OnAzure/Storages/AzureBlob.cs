@@ -178,14 +178,16 @@ namespace Liquid.OnAzure
         {
             _containerReference = GetBlobClientFromConnection().GetContainerReference(containerName);
             _containerReference.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+
+            if (!Enum.TryParse<BlobContainerPublicAccessType>(_permission, out var accessType))
+            {
+                accessType = BlobContainerPublicAccessType.Blob;
+            }
+
             _containerReference.SetPermissionsAsync(new BlobContainerPermissions
             {
-                PublicAccess = !string.IsNullOrEmpty(_permission) ?
-                    (_permission.Equals("Blob") ? BlobContainerPublicAccessType.Blob :
-                    (_permission.Equals("Off") ? BlobContainerPublicAccessType.Off :
-                    (_permission.Equals("Container") ? BlobContainerPublicAccessType.Container :
-                    (_permission.Equals("Unknown") ? BlobContainerPublicAccessType.Unknown : BlobContainerPublicAccessType.Blob)))) : BlobContainerPublicAccessType.Blob
-            }).GetAwaiter().GetResult();
+                PublicAccess = accessType
+            });
         }
     }
 }
