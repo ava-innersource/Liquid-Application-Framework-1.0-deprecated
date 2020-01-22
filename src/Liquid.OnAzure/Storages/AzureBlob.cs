@@ -110,7 +110,10 @@ namespace Liquid.OnAzure
             SetContainerReference(_container);
 
             // If the MS has the configuration outside from the repository will be used this context and not inside
-            Workbench.Instance.Repository.SetMediaStorage(this);
+            if (Workbench.Instance.Repository != null)
+            {
+                Workbench.Instance.Repository.SetMediaStorage(this);
+            }
         }
 
         /// <summary>
