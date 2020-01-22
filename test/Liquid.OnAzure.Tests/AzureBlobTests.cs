@@ -2,6 +2,7 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -43,7 +44,7 @@ namespace Liquid.OnAzure.Tests
             _sut = new AzureBlob(new MediaStorageConfiguration
             {
                 ConnectionString = "UseDevelopmentStorage=true",
-                Container = "testcontainer", // _fixture.Create<string>().ToLower(),
+                Container = _fixture.Create<string>().ToLower(CultureInfo.CurrentCulture),
             });
 
             _expectedData = _fixture.Create<string>();
@@ -61,27 +62,36 @@ namespace Liquid.OnAzure.Tests
             };
         }
 
+        public static IEnumerable<object[]> CtorWhenContainersDoesntExistsCreatesNewData { get; set; } = new[]
+        {
+            new object[] { BlobContainerPublicAccessType.Blob.ToString(),  BlobContainerPublicAccessType.Blob },
+            new object[] { BlobContainerPublicAccessType.Off.ToString(), BlobContainerPublicAccessType.Off },
+            new object[] { BlobContainerPublicAccessType.Container.ToString(), BlobContainerPublicAccessType.Container},
+            new object[] { BlobContainerPublicAccessType.Unknown.ToString(), BlobContainerPublicAccessType.Unknown },
+            new object[] { _fixture.Create<string>(), BlobContainerPublicAccessType.Blob },
+        };
+
         [Fact]
-        public void WhenConfigurationIsNullCtorThrows()
+        public void CtorWhenConfigurationIsNullThrows()
         {
             Assert.ThrowsAny<Exception>(() => new AzureBlob(null));
         }
 
         [Fact]
-        public Task WhenAttachmentIsNullInsertThrows()
+        public Task InsertUpdateAsyncWhenAttachmentIsNullThrows()
         {
             return Assert.ThrowsAnyAsync<ArgumentNullException>(() => _sut.InsertUpdateAsync(null));
         }
 
         [Fact]
-        public async Task WhenAttachmentDoesntExistsGetThrows()
+        public async Task GetWhenAttachmentDoesntExistsThrows()
         {
             // TODO: Improve exception
             await Assert.ThrowsAnyAsync<StorageException>(async () => await _sut.GetAsync(_lightAttachment.ResourceId, _lightAttachment.Id));
         }
 
         [Fact]
-        public async Task CanInsertAndGetAttachmentAsync()
+        public async Task GetAttachmentWhenItWasInsertedReturnsInsertedData()
         {
             await _sut.InsertUpdateAsync(_lightAttachment);
 
@@ -94,13 +104,13 @@ namespace Liquid.OnAzure.Tests
         }
 
         [Fact]
-        public async Task RemoveThrowsIfAttachmentIsNullAsync()
+        public async Task RemoveWhenAttachmentIsNullThrows()
         {
             await Assert.ThrowsAsync<ArgumentNullException>(async () => await _sut.Remove(null));
         }
 
         [Fact]
-        public async Task WhenResourceRemovedCantGet()
+        public async Task GetWhenResourceRemovedThrowsStorageException()
         {
             await _sut.InsertUpdateAsync(_lightAttachment);
 
@@ -111,14 +121,15 @@ namespace Liquid.OnAzure.Tests
                 Assert.Equal(_expectedData, actual);
 
                 await _sut.Remove(_lightAttachment);
-
                 await Assert.ThrowsAnyAsync<StorageException>(() => _sut.GetAsync(_lightAttachment.ResourceId, _lightAttachment.Id));
             }
         }
 
         [Theory]
-        [AutoSubstituteData]
-        public async Task CreatesContainerOnInitializationWithDesiredAccessLevelAsync(BlobContainerPublicAccessType accessType)
+        [InlineData(BlobContainerPublicAccessType.Blob, BlobContainerPublicAccessType.Blob)]
+        [InlineData(BlobContainerPublicAccessType.Off, BlobContainerPublicAccessType.Off)]
+        [InlineData(BlobContainerPublicAccessType.Container, BlobContainerPublicAccessType.Container)]
+        public async Task CtorWhenContainersDoesntExistsCreatesNew(BlobContainerPublicAccessType accessType, BlobContainerPublicAccessType expected)
         {
             // ARRANGE
             const string containerName = "removecontainer";
@@ -146,7 +157,59 @@ namespace Liquid.OnAzure.Tests
 
             var blobContainerPermissions = await container.GetPermissionsAsync();
 
-            Assert.Equal(accessType, blobContainerPermissions.PublicAccess);
+            Assert.Equal(expected, blobContainerPermissions.PublicAccess);
+        }
+
+        [Theory, AutoSubstituteData]
+        public async Task CtorWhenContainersDoesntExistsAndAccessTypeIsAnyStringCreatesWithAccessTypeBlob(string accessType)
+        {
+            const string containerName = "removecontainer";
+            var connectionString = "UseDevelopmentStorage=true";
+
+            var client = CloudStorageAccount.Parse(connectionString).CreateCloudBlobClient();
+            var container = client.GetContainerReference(containerName);
+
+            await container.DeleteIfExistsAsync();
+
+            var configuration = new MediaStorageConfiguration
+            {
+                ConnectionString = connectionString,
+                Container = containerName,
+                Permission = accessType,
+            };
+
+            // ACT
+            _ = new AzureBlob(configuration);
+
+            // ASSERT
+            container = client.GetContainerReference(containerName);
+
+            Assert.True(await container.ExistsAsync());
+
+            var blobContainerPermissions = await container.GetPermissionsAsync();
+
+            Assert.Equal(BlobContainerPublicAccessType.Blob, blobContainerPermissions.PublicAccess);
+        }
+
+        [Fact]
+        public async Task CtorWhenContainersDoesntExistsAndAccessTypeIsUnknownThrows()
+        {
+            const string containerName = "removecontainer";
+            var connectionString = "UseDevelopmentStorage=true";
+
+            var client = CloudStorageAccount.Parse(connectionString).CreateCloudBlobClient();
+            var container = client.GetContainerReference(containerName);
+
+            await container.DeleteIfExistsAsync();
+
+            var configuration = new MediaStorageConfiguration
+            {
+                ConnectionString = connectionString,
+                Container = containerName,
+                Permission = BlobContainerPublicAccessType.Unknown.ToString(),
+            };
+
+            Assert.ThrowsAny<Exception>(() => new AzureBlob(configuration));
         }
 
         public void Dispose()
@@ -160,6 +223,7 @@ namespace Liquid.OnAzure.Tests
             if (isDisposing)
             {
                 _stream?.Dispose();
+                _lightAttachment?.Dispose();
             }
         }
 
