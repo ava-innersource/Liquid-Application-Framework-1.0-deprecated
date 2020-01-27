@@ -78,42 +78,5 @@ namespace Liquid.OnAzure
 
             return Task.FromResult<T>(default(T)).Result;
         }
-
-        /// <summary>
-        /// Method to run Health Check for Azure Event hub 
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-				if (config == null)
-					this.GetConnection(string.Empty);
-
-				foreach (var item in _eventCache)
-				{
-					if(!string.IsNullOrEmpty(item.Value.HubName))
-					{
-						var connectionStringBuilder = new EventHubsConnectionStringBuilder(config.ConnectionString)
-						{
-							EntityPath = item.Value.HubName
-						};
-
-						EventHubClient eventHub = EventHubClient.CreateFromConnectionString(connectionStringBuilder.ToString());
-						var a = eventHub.GetRuntimeInformationAsync();
-						eventHub.Close();
-					}				
-				}
-             
-                return LightHealth.HealthCheck.Healthy;
-            }
-            catch
-            {
-                return LightHealth.HealthCheck.Unhealthy;
-            }
-
-        }
     }
 }

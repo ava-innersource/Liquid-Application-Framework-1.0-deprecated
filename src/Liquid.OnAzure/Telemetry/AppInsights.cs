@@ -99,25 +99,5 @@ namespace Liquid.OnAzure
             TelemetryClient.Context.Operation.Id = null;
             TelemetryClient.Context.Operation.Name = null;
         }
-
-
-        /// <summary>
-        /// Method to run Health Check for Appinsight telemetry
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-                TelemetryClient.TrackEvent("Method invoked");
-                return LightHealth.HealthCheck.Healthy;
-            }
-            catch
-            {
-                return LightHealth.HealthCheck.Unhealthy;
-            }              
-        }
     }
 }

@@ -462,25 +462,5 @@ namespace Liquid.OnAWS
             }
             throw new NotImplementedException();
         }
-
-
-        /// <summary>
-        /// Method to run Health Check for Dynamo DB Repository
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-                var c = DynamoDbClient.ListTablesAsync();
-                return LightHealth.HealthCheck.Healthy;
-            }
-            catch
-            {
-                return LightHealth.HealthCheck.Unhealthy;
-            }   
-        }
     }
 }

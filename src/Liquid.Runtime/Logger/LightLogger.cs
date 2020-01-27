@@ -101,14 +101,5 @@ namespace Liquid.Runtime
                 telemetry.TrackTrace(message);
             }
         }
-
-        /// <summary>
-        /// Method to run Health Check  
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public abstract LightHealth.HealthCheck HealthCheck(string serviceKey, string value);
-
     }
 }

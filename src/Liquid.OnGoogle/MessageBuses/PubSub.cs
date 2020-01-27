@@ -17,7 +17,7 @@ namespace Liquid.OnGoogle
     /// <summary>
     /// Implementation of the communication component between queues of the Google, this class is specific to google
     /// </summary>
-    public class PubSub : LightWorker, IWorkbenchHealthCheck
+    public class PubSub : LightWorker, IWorkbenchService
     {
         private  SubscriberClient subscriberClient;
         private  SubscriptionName _subscriptionName;
@@ -115,36 +115,6 @@ namespace Liquid.OnGoogle
         protected override Task ProcessAsync()
         {
             throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Method to run Health Check for PubSub light Work
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-                if (_topics.Count > 0)
-                {
-                    var topicEnum = _topics.GetEnumerator();
-                    var topic = topicEnum.Current;
-                    GooglePubSubConfiguration config = GetConnection(topic);
-                    MethodInfo method = GetMethod(topic);
-                    string topicName = topic.Value.TopicName;
-                    string subscriptName = topic.Value.Subscription;
-
-                    this._subscriptionName = new SubscriptionName(config.ProjectID, subscriptName);
-                    this.subscriberClient = SubscriberClient.CreateAsync(_subscriptionName).Result;
-                }
-                return LightHealth.HealthCheck.Healthy;
-            }
-            catch
-            {
-                return LightHealth.HealthCheck.Unhealthy;
-            }
         }
     }
 }
