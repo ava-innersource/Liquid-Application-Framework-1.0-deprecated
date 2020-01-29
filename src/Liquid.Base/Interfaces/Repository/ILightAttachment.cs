@@ -14,7 +14,5 @@ namespace Liquid.Interfaces
         /// The directory where the attachment will be stored into.
         /// </summary>
         string ResourceId { get; set; }
-
-        //string DirectoryName { get; set; }
     }
 }
