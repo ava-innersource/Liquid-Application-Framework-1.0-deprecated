@@ -69,9 +69,20 @@ namespace Liquid
                 throw new ArgumentNullException(nameof(encoding));
             }
 
+            return AsStringAsyncImpl(stream, encoding);
+        }
+
+        /// <summary>
+        /// Read the stream to the end and converts it to a string accordingly to the desired encoding asynchronously.
+        /// </summary>
+        /// <param name="stream">The stream that will be read to the end.</param>
+        /// <param name="encoding">The encoding of the string in the stream.</param>
+        /// <returns>Task containg the result of the conversion from stream to string.</returns>
+        private static async Task<string> AsStringAsyncImpl(this Stream stream, Encoding encoding)
+        {
             using (var reader = new StreamReader(stream, encoding))
             {
-                return reader.ReadToEndAsync();
+                return await reader.ReadToEndAsync();
             }
         }
     }
