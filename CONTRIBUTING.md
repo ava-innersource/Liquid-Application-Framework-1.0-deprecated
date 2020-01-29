@@ -65,13 +65,13 @@ TODO
 The general naming pattern is `Liquid.<area>.<subarea>`.
 
 ## Unit tests
-We use xUnit.net for all unit testing.
+We use xUnit.net for all unit testing. Additionally, you can use nSubstitute for mocks and such, and leverage AutoFixture for anonymous instances.
 
 ## Code Style
 
 ### General
 
-The most general guideline is that we use all the VS default settings in terms of code formatting, except that we put System namespaces before other namespaces (this used to be the default in VS, but it changed in a more recent version of VS).
+The most general guideline is that we use all the VS default settings in terms of code formatting, except that we put System namespaces before other namespaces (this used to be the default in VS, but it changed in a more recent version of VS). Also, we are leveraging StyleCop to add to code standardization. 
 
 1. Use four spaces of indentation (no tabs)
 1. Use `_camelCase` for private fields
@@ -161,7 +161,7 @@ As a modern set of frameworks, usage of internal types and members is allowed, b
 
 `InternalsVisibleTo` is used only to allow a unit test to test internal types and members of its runtime assembly. We do not use `InternalsVisibleTo` between two runtime assemblies.
 
-If two runtime assemblies need to share common helpers then we will use a "shared source" solution with build-time only packages. Check out the some of the projects in https://github.com/aspnet/Common/ and how they are referenced from other solutions.
+If two runtime assemblies need to share common helpers then we will use a "shared source" solution with build-time only packages.
 
 If two runtime assemblies need to call each other's APIs, the APIs must be public. If we need it, it is likely that our customers need it.
 
@@ -219,11 +219,11 @@ Code style is usually enforced by Analyzers; any change to those rules must be d
 
 The items below point out the good practices that all code should follow.
 
-### Zero warnings
+#### Zero warnings
 
 Compiler warnings should usually be dealt with by correcting the code. Only discussed warnings may be allowed to be marked as exceptions.
 
-### Inner documentation
+#### Inner documentation
 
 All public members must be documented. Documentation should clarify the purpose and usage of code elements, so comments such as FooManager: "manages foo" will be rejected. Classes that implement interface may use comment inheritance `/// <inheritdoc/>`, but use it sparingly. 
 
@@ -251,7 +251,7 @@ All comments should be read-proof.
 
 The unit tests for the `Liquid.Fruit` assembly live in the `Liquid.Fruit.Tests` assembly.
 
-The functional tests for the `Microsoft.Fruit` assembly live in the `Microsoft.Fruit.AcceptanceTests` assembly.
+The functional tests for the `Liquid.Fruit` assembly live in the `Microsoft.Fruit.AcceptanceTests` assembly.
 
 In general there should be exactly one unit test assembly for each product runtime assembly. In general there should be one functional test assembly per repo. Exceptions can be made for both.
 
@@ -261,10 +261,13 @@ Test class names end with Test and live in the same namespace as the class being
 
 #### Unit test method naming
 
-Unit test method names must be descriptive about what is being tested, under what conditions, and what the expectations are. Pascal casing and underscores can be used to improve readability. The following test names are correct:
+Unit test method names must be descriptive about what is being tested, under what conditions, and what the expectations are. Pascal casing and underscores can be used to improve readability. We will try to follow [Roy Osherove's guidelines](https://osherove.com/blog/2005/4/3/naming-standards-for-unit-tests.html), therefore, the following test names are correct:
 
-`PublicApiArgumentsShouldHaveNotNullAnnotation`
-`Public_api_arguments_should_have_not_null_annotation`
+`GetAttachmentWhenItWasInsertedReturnsInsertedData`
+`GetWhenAttachmentDoesntExistsThrows`
+
+> Notice how we use When and Returns / Throws to split the name into recognizable parts.
+
 The following test names are incorrect:
 
 ```
