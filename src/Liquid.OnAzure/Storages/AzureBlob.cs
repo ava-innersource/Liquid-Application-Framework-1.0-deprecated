@@ -1,62 +1,113 @@
 using Liquid.Interfaces;
 using Liquid.Repository;
 using Liquid.Runtime.Configuration.Base;
-using Microsoft.WindowsAzure.Storage; // Namespace for CloudStorageAccount  
-using Microsoft.WindowsAzure.Storage.Blob; // Namespace for Blob storage types  
+using Microsoft.WindowsAzure.Storage; 
+using Microsoft.WindowsAzure.Storage.Blob; 
 using System;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace Liquid.OnAzure
 {
-
     /// <summary>
     /// Cartridge for Azure Blob
     /// </summary>
     public class AzureBlob : ILightMediaStorage
     {
-        public MediaStorageConfiguration mediaStorageConfiguration { get; set; }
-        public String Conection { get; set; }
-        public string Permission { get; set; }
-        private CloudBlobContainer _containerReference { get; set; }
+        /// <summary>
+        /// Used to access the actual Storage container.
+        /// </summary>
+        private CloudBlobContainer _containerReference;
+
+        /// <summary>
+        /// The name of the Azure Blob container where data is being stored.
+        /// </summary>
         private string _container = string.Empty;
-        public String Container
+
+        /// <summary>
+        /// The connection string to the Azure Blob storage.
+        /// </summary>
+        private string _connection; // please don't remove - we will remove the property later
+
+        /// <summary>
+        /// Permission to be applied to newly created containers.
+        /// </summary>
+        private string _permission; // please don't remove - we will remove the property later
+
+        /// <summary>
+        /// The connection string for the storage provider.
+        /// </summary>
+        [Obsolete("This property will be removed in later version. Please refrain from accessing it.")]
+        public string Connection { get => _connection; set => _connection = value; }
+
+        /// <summary>
+        /// Permission to be applied to newly created containers.
+        /// </summary>
+        [Obsolete("This property will be removed in later version. Please refrain from accessing it.")]
+        public string Permission { get => _permission; set => _permission = value; }
+
+        /// <summary>
+        /// The container name used to store data in the provider.
+        /// </summary>
+        [Obsolete("This property will be removed in later version. Please refrain from accessing it.")]
+        public string Container
         {
             get { return _container; }
             set
             {
                 _container = value;
-                _containerReference = _blobClient.GetContainerReference(value);
-                _containerReference.CreateIfNotExistsAsync();
-                _containerReference.SetPermissionsAsync(
-                    new BlobContainerPermissions
-                    {
-                        PublicAccess = !string.IsNullOrEmpty(Permission) ?
-                        (Permission.Equals("Blob") ? BlobContainerPublicAccessType.Blob :
-                        (Permission.Equals("Off") ? BlobContainerPublicAccessType.Off :
-                        (Permission.Equals("Container") ? BlobContainerPublicAccessType.Container :
-                        (Permission.Equals("Unknown") ? BlobContainerPublicAccessType.Unknown : BlobContainerPublicAccessType.Blob)))) : BlobContainerPublicAccessType.Blob
-                    });
+                SetContainerReference(value);
             }
         }
 
-        private CloudStorageAccount _storageAAccountConnection
+        /// <summary>
+        /// Initializes a new instance of <see cref="AzureBlob"/>.
+        /// </summary>        
+        public AzureBlob()
         {
-            get { return CloudStorageAccount.Parse(Conection); }
+
         }
 
-        private CloudBlobClient _blobClient
+        /// <summary>
+        /// Initializes a new instance of <see cref="AzureBlob"/>.
+        /// </summary>
+        /// <param name="configuration">The configuration for this class.</param>
+        public AzureBlob(MediaStorageConfiguration configuration)
         {
-            get { return _storageAAccountConnection.CreateCloudBlobClient(); }
+            if (configuration is null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
+
+            Initialize(configuration);
         }
 
+        /// <summary>
+        /// Initializes the object. 
+        /// </summary>
+        /// <remarks>
+        /// This method obtains the configuration using <see cref="LightConfigurator"/> directly.
+        /// </remarks>
         public void Initialize()
         {
-            //Get the configuration on appsetting. But in this case the features can be accessed outside from the repository
-            this.mediaStorageConfiguration = LightConfigurator.Config<MediaStorageConfiguration>("MediaStorage");
-            this.Conection = mediaStorageConfiguration.ConnectionString;
-            this.Permission = mediaStorageConfiguration.Permission;
-            this.Container = mediaStorageConfiguration.Container;
+            // TODO: mark this as obsolete and remove it.
+
+            // Get the configuration on appsetting. But in this case the features can be accessed outside from the repository
+            var configuration = LightConfigurator.Config<MediaStorageConfiguration>("MediaStorage");
+            Initialize(configuration);
+        }
+
+        /// <summary>
+        /// Initializes the class based on the provided configuration.
+        /// </summary>
+        /// <param name="configuration">The configuiration for this class.</param>
+        private void Initialize(MediaStorageConfiguration configuration)
+        {
+            _connection = configuration.ConnectionString;
+            _container = configuration.Container;
+            _permission = configuration.Permission;
+
+            SetContainerReference(_container);
 
             // If the MS has the configuration outside from the repository will be used this context and not inside
             if (Workbench.Instance.Repository != null)
@@ -65,12 +116,25 @@ namespace Liquid.OnAzure
             }
         }
 
+        /// <summary>
+        /// Gets a media attachment from the blob storage.
+        /// </summary>
+        /// <param name="resourceId"></param>
+        /// <param name="id"></param>
+        /// <returns>The attachment that was obtained from the underlying storage.</returns>
         public async Task<ILightAttachment> GetAsync(string resourceId, string id)
         {
-            var blob = _containerReference.GetBlobReference(resourceId + "/" + id);
-            Stream stream = new MemoryStream();
+            //var blob = _containerReference.GetBlobReference(resourceId + "/" + id);
+
+            var blob = _containerReference.GetDirectoryReference(resourceId).GetBlockBlobReference(id);
+
+            var stream = new MemoryStream();
+
             await blob.DownloadToStreamAsync(stream);
-            LightAttachment _blob = new LightAttachment()
+
+            stream.Seek(0, SeekOrigin.Begin);
+
+            return new LightAttachment
             {
                 MediaStream = stream,
                 Id = id,
@@ -79,35 +143,29 @@ namespace Liquid.OnAzure
                 Name = blob.Name,
                 MediaLink = blob.Uri.AbsoluteUri
             };
-            return _blob;
         }
 
-        private byte[] ReadFully(Stream input, int size)
+        public Task InsertUpdateAsync(ILightAttachment attachment)
         {
-            byte[] buffer = new byte[size];
-            using (MemoryStream ms = new MemoryStream())
+            if (attachment is null)
             {
-                int read;
-                while ((read = input.Read(buffer, 0, size)) > 0)
-                {
-                    ms.Write(buffer, 0, read);
-                }
-                return ms.ToArray();
+                throw new ArgumentNullException(nameof(attachment));
             }
-        }
 
-        public async Task InsertUpdateAsync(ILightAttachment attachment)
-        {
-            var targetFile = attachment.Id;
-            var blockBlob = _containerReference.GetDirectoryReference(attachment.ResourceId).GetBlockBlobReference(targetFile);
+            var blockBlob = _containerReference.GetDirectoryReference(attachment.ResourceId).GetBlockBlobReference(attachment.Id);
+
             blockBlob.Properties.ContentType = attachment.ContentType;
-            await blockBlob.UploadFromByteArrayAsync(ReadFully(attachment.MediaStream, blockBlob.StreamWriteSizeInBytes),
-                            0, (int)attachment.MediaStream.Length);
 
+            return blockBlob.UploadFromStreamAsync(attachment.MediaStream, attachment.MediaStream.Length);
         }
 
         public Task Remove(ILightAttachment attachment)
         {
+            if (attachment is null)
+            {
+                throw new ArgumentNullException(nameof(attachment));
+            }
+
             var targetFile = attachment.Id;
             var blockBlob = _containerReference.GetDirectoryReference(attachment.ResourceId).GetBlockBlobReference(targetFile);
             return blockBlob.DeleteIfExistsAsync();
@@ -124,14 +182,34 @@ namespace Liquid.OnAzure
             try
             {
                 TimeSpan span = new TimeSpan(0, 0, 1);
-                this._containerReference.AcquireLeaseAsync(span);
-                this._containerReference.BreakLeaseAsync(span);
+                _containerReference.AcquireLeaseAsync(span);
+                _containerReference.BreakLeaseAsync(span);
                 return LightHealth.HealthCheck.Healthy;
             }
             catch
             {
+                // TODO: Track exception
                 return LightHealth.HealthCheck.Unhealthy;
             }
+        }
+
+        private CloudBlobClient GetBlobClientFromConnection()
+        {
+            return CloudStorageAccount.Parse(_connection).CreateCloudBlobClient();
+        }
+
+        private void SetContainerReference(string containerName)
+        {
+            _containerReference = GetBlobClientFromConnection().GetContainerReference(containerName);
+            _containerReference.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+            _containerReference.SetPermissionsAsync(new BlobContainerPermissions
+            {
+                PublicAccess = !string.IsNullOrEmpty(_permission) ?
+                    (_permission.Equals("Blob") ? BlobContainerPublicAccessType.Blob :
+                    (_permission.Equals("Off") ? BlobContainerPublicAccessType.Off :
+                    (_permission.Equals("Container") ? BlobContainerPublicAccessType.Container :
+                    (_permission.Equals("Unknown") ? BlobContainerPublicAccessType.Unknown : BlobContainerPublicAccessType.Blob)))) : BlobContainerPublicAccessType.Blob
+            }).GetAwaiter().GetResult();
         }
     }
 }

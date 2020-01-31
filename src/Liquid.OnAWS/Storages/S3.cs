@@ -11,7 +11,7 @@ namespace Liquid.OnAWS
 {
     public class S3 : ILightMediaStorage
     {
-        public string Conection { get; set; }
+        public string Connection { get; set; }
         public string Container { get; set; }
 		public dynamic mediaStorageConfiguration { get; set; }
 
