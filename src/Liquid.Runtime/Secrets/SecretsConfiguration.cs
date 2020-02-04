@@ -14,10 +14,11 @@ namespace Liquid.Runtime
 
         public override void Validate()
         {
-            //Validating parameters that do not come from body by a Fluent-like sintax
-            RuleFor(d => Module).NotEmpty().WithMessage("'Module' on Secrets settings should not be empty.");
             RuleFor(d => Enable).NotNull().WithMessage("'Enable' on Secrets settings should not be empty.");
-            RuleFor(d => Name).NotEmpty().WithMessage("'Name' on Secrets settings should not be empty.");
+            
+            //Validating parameters that do not come from body by a Fluent-like sintax
+            RuleFor(d => Module).NotEmpty().When(d => Enable).WithMessage("'Module' on Secrets settings should not be empty.");
+            RuleFor(d => Name).NotEmpty().When(d => Enable).WithMessage("'Name' on Secrets settings should not be empty.");
         }
     }
 }
