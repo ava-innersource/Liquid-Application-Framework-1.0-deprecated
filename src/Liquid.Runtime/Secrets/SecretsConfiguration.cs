@@ -19,6 +19,9 @@ namespace Liquid.Runtime
             //Validating parameters that do not come from body by a Fluent-like sintax
             RuleFor(d => Module).NotEmpty().When(d => Enable).WithMessage("'Module' on Secrets settings should not be empty.");
             RuleFor(d => Name).NotEmpty().When(d => Enable).WithMessage("'Name' on Secrets settings should not be empty.");
+
+            RuleFor(d => Module).Equal("K8S_SECRETS").When(d => Enable).WithMessage("'Module' on Secrets settings should be equal to K8S_SECRETS");
+
         }
     }
 }
