@@ -88,6 +88,11 @@ namespace Liquid
     public class Workbench
     {
         /// <summary>
+        /// Holds the singleton services used by Workbench, indexed by their 'service types'.
+        /// </summary>
+        private Dictionary<WorkbenchServiceType, IWorkbenchService> _singletonCache = new Dictionary<WorkbenchServiceType, IWorkbenchService>();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Workbench"/> class.
         /// </summary>
         private Workbench()
@@ -98,9 +103,6 @@ namespace Liquid
         /// Gets the singleton instance of <see cref="Workbench"/>.
         /// </summary>
         public static Workbench Instance { get; } = new Workbench();
-
-        // _singletonCache exposed to be used by Health Check.
-        public Dictionary<WorkbenchServiceType, IWorkbenchService> _singletonCache = new Dictionary<WorkbenchServiceType, IWorkbenchService>();
 
         /// <summary>
         /// Gets the default <see cref="ILightRepository"/> implementation.

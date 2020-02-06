@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Liquid.OnAzure.Hubs
 {
-    public class EventHub : LightWorker, IWorkbenchHealthCheck
+    public class EventHub : LightWorker, IWorkbenchService
     {
 
         HubConfiguration config = null;
@@ -112,29 +112,5 @@ namespace Liquid.OnAzure.Hubs
         {
             throw new NotImplementedException();
         }
-
-        /// <summary>
-        /// Method to run Health Check for Azure Event hub 
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-
-                EventHubClient eventHub = EventHubClient.CreateFromConnectionString(config.ConnectionString);
-                var a = eventHub.GetRuntimeInformationAsync();
-                eventHub.Close();
-                return LightHealth.HealthCheck.Healthy;
-            }
-            catch
-            {
-                return LightHealth.HealthCheck.Unhealthy;
-            }
-
-        }
-
     }
 }

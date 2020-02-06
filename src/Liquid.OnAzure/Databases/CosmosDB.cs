@@ -420,7 +420,7 @@ namespace Liquid.OnAzure
             {
                 attachmentDB.MediaLink = null;
                 await _client.UpsertAttachmentAsync(doc.SelfLink, attachmentDB, new RequestOptions() { PartitionKey = new PartitionKey(Undefined.Value) });
-                await _mediaStorage.InsertUpdateAsync(upserted);                       
+                await _mediaStorage.InsertUpdateAsync(upserted);
             }
             else
             {
@@ -744,25 +744,6 @@ namespace Liquid.OnAzure
         }
 
         /// <summary>
-        /// Method to run Health Check for Cosmos DB 
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-                var x = _client.OpenAsync();
-                return LightHealth.HealthCheck.Healthy;
-            }
-            catch
-            {
-                return LightHealth.HealthCheck.Unhealthy;
-            }
-        }
-
-        /// <summary>
         /// Implement a condition optimistic. In this case the value eTag will be used for control on optimist concurrency.
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -847,7 +828,7 @@ namespace Liquid.OnAzure
             {
                 _collectionName = T.Name;
                 var _collection = new LightLazy<DocumentCollection>(async () => await GetOrCreateCollectionAsync());
-                
+
                 this._typeToCollectionMap.TryAdd(T, _collection);
             }
             else

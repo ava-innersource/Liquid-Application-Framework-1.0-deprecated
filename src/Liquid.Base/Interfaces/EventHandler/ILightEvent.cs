@@ -9,7 +9,7 @@ namespace Liquid.Interfaces
     /// <summary>
     /// Interface message inheritance to use a liquid framework
     /// </summary> 
-    public interface ILightEvent : IWorkbenchHealthCheck
+    public interface ILightEvent : IWorkbenchService
     {
         Task<T> SendToHub<T>(T model, string dataOperation);
     }

@@ -178,25 +178,5 @@ namespace Liquid.OnGoogle
         {
             throw new NotImplementedException();
         }
-
-
-        /// <summary>
-        /// Method to run Health Check for google Stack Driver Telemetry (not yet implemented)
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-                clientV2.WriteLogEntriesAsync(LogNameOneof.From(logName), null, null,null);
-                return LightHealth.HealthCheck.Healthy;
-            }
-            catch
-            {
-                return LightHealth.HealthCheck.Unhealthy;
-            }
-        }
     }
 }

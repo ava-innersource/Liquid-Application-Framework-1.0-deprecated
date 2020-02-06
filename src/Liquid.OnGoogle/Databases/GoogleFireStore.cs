@@ -675,24 +675,5 @@ namespace Liquid.OnGoogle
             }
             return retorno;
         }
-
-        /// <summary>
-        /// Method to run Health Check for Google Firestore Repository
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-                var x = _client.StartBatch();
-                return LightHealth.HealthCheck.Healthy;
-            }
-            catch
-            {
-                return LightHealth.HealthCheck.Unhealthy;
-            }
-        }
     }
 }

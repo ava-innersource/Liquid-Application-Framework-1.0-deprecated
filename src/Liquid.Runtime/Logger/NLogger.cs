@@ -49,13 +49,13 @@ namespace Liquid.Runtime
 
                 FileNameKind = FilePathKind.Relative,
                 FileAttributes = Win32FileAttributes.Normal,
-                CreateDirs= true, 
+                CreateDirs = true,
                 ArchiveAboveSize = 102400,
                 ArchiveNumbering = ArchiveNumberingMode.Sequence,
                 MaxArchiveFiles = 100,
                 ConcurrentWrites = true,
                 KeepFileOpen = true,
-                DeleteOldFileOnStartup = true 
+                DeleteOldFileOnStartup = true
             };
             config.AddTarget(fileTarget);
 
@@ -133,23 +133,6 @@ namespace Liquid.Runtime
         {
             base.Warn(message, args);
             logger.Warn(message, args);
-        }
-        /// <summary>
-        /// HealthCheck
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-                return LightHealth.HealthCheck.Healthy;
-            }
-            catch
-            {
-                return LightHealth.HealthCheck.Unhealthy;
-            }
         }
     }
 }

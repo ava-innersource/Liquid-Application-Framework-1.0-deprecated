@@ -109,24 +109,5 @@ namespace Liquid.OnAzure
         {
             await _redisClient.SetAsync(key, ToByteArray(value), _options);
         }
-
-        /// <summary>
-        /// Method to run Health Check for Azure Redis
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-                var redis = _redisClient.GetAsync(serviceKey);
-                return LightHealth.HealthCheck.Healthy;
-            }
-            catch
-            {
-                return LightHealth.HealthCheck.Unhealthy;
-            }   
-        }
     }
 }

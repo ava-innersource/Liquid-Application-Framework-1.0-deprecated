@@ -473,16 +473,6 @@ namespace Liquid.Repository
         public abstract dynamic AccessConditionOptimistic<T>(T model);
 
         /// <summary>
-        /// Abstract method to force inherithed class to implement Health Check Method.
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public abstract LightHealth.HealthCheck HealthCheck(string serviceKey, string value);
-
-
-
-        /// <summary>
         /// While in abstract layer, this method calls the LightEvent per CRUD operations in repository
         /// </summary>
         /// <typeparam name="T"></typeparam>

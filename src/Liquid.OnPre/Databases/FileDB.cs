@@ -461,18 +461,6 @@ namespace Liquid.OnWindowsClient
         }
 
         /// <summary>
-        /// Method to run Health Check for File 
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        /// <summary>
         /// Implement a condition optimistic. In this case the value eTag will be used for control on optimist concurrency.
         /// </summary>
         /// <typeparam name="T"></typeparam>

@@ -102,13 +102,5 @@ namespace Liquid.Runtime
                 return default(T);
             }
         }
-
-        /// <summary>
-        /// Abstract method to force inherithed class to implement Health Check Method.
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public abstract LightHealth.HealthCheck HealthCheck(string serviceKey, string value);
     }
 }

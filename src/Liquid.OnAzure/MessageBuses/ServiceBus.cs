@@ -16,7 +16,7 @@ namespace Liquid.OnAzure
     /// <summary>
     /// Implementation of the communication component between queues and topics of the Azure, this class is specific to azure
     /// </summary>
-    public class ServiceBus : LightWorker, IWorkbenchHealthCheck
+    public class ServiceBus : LightWorker, IWorkbenchService
     {
         /// <summary>
         /// Implementation of the start process queue and process topic. It must be called  parent before start processes.
@@ -207,59 +207,6 @@ namespace Liquid.OnAzure
         protected override Task ProcessAsync()
         {
             throw new NotImplementedException();
-        }
-
-
-        /// <summary>
-        /// Method to run Health Check for Service Bus
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-                if (_topics.Count > 0)
-                {
-                    foreach (KeyValuePair<MethodInfo, TopicAttribute> item in _topics)
-                    {
-                        if (!string.IsNullOrEmpty(item.Value.TopicName.ToString()))
-                        {
-                            TopicClient topicClient = new TopicClient(GetConnection(item), item.Value.TopicName, RetryPolicy.Default);
-
-                            var scheduledMessageId = topicClient.ScheduleMessageAsync(
-                                    new Message(Encoding.UTF8.GetBytes("HealthCheckTestMessage")),
-                                    new DateTimeOffset(DateTime.UtcNow).AddHours(2));
-
-                            topicClient.CancelScheduledMessageAsync(scheduledMessageId.Result);
-                        }
-                    }
-                }
-
-                if (_queues.Count > 0)
-                {
-                    foreach (KeyValuePair<MethodInfo, QueueAttribute> item in _queues)
-                    {
-
-                        if (!string.IsNullOrEmpty(item.Value.QueueName.ToString()))
-                        {
-
-                            QueueClient queueReceiver = new QueueClient(GetConnection(item), item.Value.QueueName, ReceiveMode.ReceiveAndDelete);
-                            var scheduledMessageId = queueReceiver.ScheduleMessageAsync(
-                                    new Message(Encoding.UTF8.GetBytes("HealthCheckTestMessage")),
-                                    new DateTimeOffset(DateTime.UtcNow).AddHours(2));
-
-                            queueReceiver.CancelScheduledMessageAsync(scheduledMessageId.Result);
-                        }
-                    }
-                }
-                return LightHealth.HealthCheck.Healthy;
-            }
-            catch
-            {
-                return LightHealth.HealthCheck.Unhealthy;
-            }
         }
     }
 }

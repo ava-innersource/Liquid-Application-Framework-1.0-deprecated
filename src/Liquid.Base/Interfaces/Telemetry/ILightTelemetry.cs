@@ -2,7 +2,7 @@
 
 namespace Liquid.Interfaces
 {
-    public interface ILightTelemetry : IWorkbenchHealthCheck
+    public interface ILightTelemetry : IWorkbenchService
     {
         void TrackTrace(params object[] trace);
         void TrackEvent(params object[] events);

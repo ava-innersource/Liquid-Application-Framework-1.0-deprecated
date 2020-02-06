@@ -66,9 +66,6 @@ namespace Liquid.Middleware
             // Enables Json localization
             builder.AddLocalization();
 
-            /////Adicionando o serviço de Health Check
-            builder.UseHealthCheck();
-
             // Inject Model Specification middleware
             builder.UseModelSpecification(); 
 

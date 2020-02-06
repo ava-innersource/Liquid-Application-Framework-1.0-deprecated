@@ -63,24 +63,5 @@ namespace Liquid.OnAWS
             
             return _client.DeleteObjectAsync(deleteObject);
         }
-
-        /// <summary>
-        /// Method to run the Health Check for S3 Media Storage
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-                _client.ListBucketsAsync();
-                return LightHealth.HealthCheck.Healthy;
-            }
-            catch
-            {
-                return LightHealth.HealthCheck.Unhealthy;
-            }                
-        }
     }
 }
