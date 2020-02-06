@@ -54,7 +54,7 @@ namespace Liquid.OnGoogle.MessageBuses
         /// <typeparam name="T">Type of message to send</typeparam>
         /// <param name="message">Object of message to send</param>
         /// <returns>The task of Process topic</returns> 
-        public override async Task SendToQueue<T>(T message)
+        public override async Task SendToQueue(object message)
         {
             var _pub = PublisherClient.CreateAsync(new TopicName(ProjectID, _queueName), null, null).Result;
             await _pub.PublishAsync(Google.Protobuf.ByteString.CopyFromUtf8(message.ToStringCamelCase()));
@@ -66,7 +66,7 @@ namespace Liquid.OnGoogle.MessageBuses
         /// <typeparam name="T">Type of message to send</typeparam>
         /// <param name="message">Object of message to send</param>
         /// <returns>The task of Process topic</returns> 
-        public override async Task SendToTopic<T>(T message)
+        public override async Task SendToTopic(object message)
         {
             var _pub = PublisherClient.CreateAsync(new TopicName(ProjectID, _queueName), null, null).Result;
             await _pub.PublishAsync(Google.Protobuf.ByteString.CopyFromUtf8(message.ToStringCamelCase()));

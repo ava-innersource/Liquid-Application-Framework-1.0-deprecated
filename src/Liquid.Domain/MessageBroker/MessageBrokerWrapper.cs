@@ -28,7 +28,7 @@ namespace Liquid.Domain
         /// <typeparam name="T">type of message</typeparam>
         /// <param name="message">message</param>
         /// <returns>A Task that completes when the middleware has completed processing.</returns>
-        public virtual Task SendToQueue<T>(T message) where T : ILightMessage { return Task.FromResult(0); }
+        public virtual Task SendToQueue(object message) { return Task.FromResult(0); }
 
         /// <summary>
         /// Send a message to a topic
@@ -36,6 +36,6 @@ namespace Liquid.Domain
         /// <typeparam name="T">type of message</typeparam>
         /// <param name="message">message</param>
         /// <returns>A Task that completes when the middleware has completed processing.</returns>
-        public virtual Task SendToTopic<T>(T message) where T : ILightMessage { return Task.FromResult(0); }
+        public virtual Task SendToTopic(object message) { return Task.FromResult(0); }
     }
 }
