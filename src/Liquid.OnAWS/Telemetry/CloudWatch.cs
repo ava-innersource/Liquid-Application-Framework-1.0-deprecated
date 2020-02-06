@@ -181,23 +181,5 @@ namespace Liquid.OnAWS
         {
             throw new NotImplementedException();
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-                var x = _amazonCloud.ListMetricsAsync();
-                return LightHealth.HealthCheck.Healthy;
-            }catch
-            {
-                return LightHealth.HealthCheck.Unhealthy;
-            }                
-        }
     }
 }

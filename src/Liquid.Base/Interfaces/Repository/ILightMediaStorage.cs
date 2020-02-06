@@ -10,7 +10,7 @@ namespace Liquid.Interfaces
     /// <summary>
     /// Defines an object capable of storing arbritary media.
     /// </summary>
-    public interface ILightMediaStorage : IWorkbenchHealthCheck
+    public interface ILightMediaStorage : IWorkbenchService
     {
         /// <summary>
         /// Gets or sets the connection string for the storage provider.

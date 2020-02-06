@@ -17,7 +17,7 @@ namespace Liquid.OnAWS
     /// <summary>
     /// Implementation of the communication component between queues and topics of the Azure, this class is specific to azure
     /// </summary>
-    public class AwsSqsSns : LightWorker, IWorkbenchHealthCheck
+    public class AwsSqsSns : LightWorker, IWorkbenchService
     {
         /// <summary>
         /// Implementation of the start process queue and process topic. It must be called  parent before start processes.
@@ -169,55 +169,12 @@ namespace Liquid.OnAWS
                 ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(exception);
             }
         }
+
         protected override Task ProcessAsync()
         {
             ProcessQueue();
             ProcessSubscription();
             return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Method to run light work Health Check for AWS 
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-                if (_queues.Count > 0)
-                {
-                    var queueEnum = _queues.GetEnumerator();
-                    var queue = queueEnum.Current;
-
-                    SqsSnsConfiguration config = GetConnection(queue);
-                    MethodInfo method = GetMethod(queue);
-                    string queueName = queue.Value.QueueName;
-                    int takeQuantity = queue.Value.TakeQuantity;
-                    AmazonSQSClient sqsClient = new AmazonSQSClient(config.AwsAccessKeyId, config.AwsSecretAccessKey);
-                    sqsClient.ListQueuesAsync("healthQueue");
-                }
-
-                if (_topics.Count > 0)
-                {
-                    var topicEnum = _topics.GetEnumerator();
-                    var topic = topicEnum.Current;
-                    SqsSnsConfiguration config = GetConnection(topic);
-                    MethodInfo method = GetMethod(topic);
-                    string topicName = topic.Value.TopicName;
-                    string subscriptName = topic.Value.Subscription;
-
-                    AmazonSimpleNotificationServiceClient snsClient = new AmazonSimpleNotificationServiceClient(config.AwsAccessKeyId, config.AwsSecretAccessKey);
-                    snsClient.ListTopicsAsync("healthTopic");
-                }
-
-                return LightHealth.HealthCheck.Healthy;
-            }
-            catch 
-            {
-                return LightHealth.HealthCheck.Unhealthy;
-            }               
         }
     }
 }

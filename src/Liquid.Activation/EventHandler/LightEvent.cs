@@ -80,7 +80,5 @@ namespace Liquid.Activation
         }
 
         public abstract Task<T> SendToHub<T>(T model, string dataOperation);
-
-        public abstract LightHealth.HealthCheck HealthCheck(string serviceKey, string value);
     }
 }

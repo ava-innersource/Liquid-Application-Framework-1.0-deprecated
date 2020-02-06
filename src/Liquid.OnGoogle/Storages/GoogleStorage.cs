@@ -54,25 +54,5 @@ namespace Liquid.OnGoogle
 
             return Task.CompletedTask;
         }
-
-        /// <summary>
-        /// Method to run HealthCheck for Google Storage
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-                var bucket = _client.ListBuckets(this._bucket.ProjectNumber.ToString());
-                return LightHealth.HealthCheck.Healthy;
-            }
-            catch
-            {
-                return LightHealth.HealthCheck.Unhealthy;
-            }
-        }
-
     }
 }

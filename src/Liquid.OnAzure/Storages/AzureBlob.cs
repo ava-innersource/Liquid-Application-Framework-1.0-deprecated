@@ -171,28 +171,6 @@ namespace Liquid.OnAzure
             return blockBlob.DeleteIfExistsAsync();
         }
 
-        /// <summary>
-        /// Method to run Health Check for AzureBlob Media Storage
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-                TimeSpan span = new TimeSpan(0, 0, 1);
-                _containerReference.AcquireLeaseAsync(span);
-                _containerReference.BreakLeaseAsync(span);
-                return LightHealth.HealthCheck.Healthy;
-            }
-            catch
-            {
-                // TODO: Track exception
-                return LightHealth.HealthCheck.Unhealthy;
-            }
-        }
-
         private CloudBlobClient GetBlobClientFromConnection()
         {
             return CloudStorageAccount.Parse(_connection).CreateCloudBlobClient();

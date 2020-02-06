@@ -108,24 +108,5 @@ namespace Liquid.OnWindowsClient
         {
             Cache.Add(key, value, options);
         }
-
-        /// <summary>
-        /// Method to run Health Check for MemoryCache
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-        {
-            try
-            {
-                var cache = Cache.Get(serviceKey);
-                return LightHealth.HealthCheck.Healthy;
-            }
-            catch
-            {
-                return LightHealth.HealthCheck.Unhealthy;
-            }
-        }
     }
 }

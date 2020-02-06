@@ -120,11 +120,6 @@ namespace Liquid.Base.Tests
                 throw new NotImplementedException();
             }
 
-            public LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-            {
-                throw new NotImplementedException();
-            }
-
             public void Initialize()
             {
                 throw new NotImplementedException();
@@ -214,11 +209,6 @@ namespace Liquid.Base.Tests
                 throw new NotImplementedException();
             }
 
-            public LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-            {
-                throw new NotImplementedException();
-            }
-
             public void Initialize()
             {
                 throw new NotImplementedException();
@@ -277,11 +267,6 @@ namespace Liquid.Base.Tests
                 throw new NotImplementedException();
             }
 
-            public LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-            {
-                throw new NotImplementedException();
-            }
-
             public void Initialize()
             {
                 throw new NotImplementedException();
@@ -311,11 +296,6 @@ namespace Liquid.Base.Tests
             }
 
             public Task<T> GetAsync<T>(string key)
-            {
-                throw new NotImplementedException();
-            }
-
-            public LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
             {
                 throw new NotImplementedException();
             }
@@ -375,11 +355,6 @@ namespace Liquid.Base.Tests
                 throw new NotImplementedException();
             }
 
-            public LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-            {
-                throw new NotImplementedException();
-            }
-
             public void Info(string message, object[] args = null)
             {
                 throw new NotImplementedException();
@@ -410,11 +385,6 @@ namespace Liquid.Base.Tests
 
         private class MockEventHandler : ILightEvent
         {
-            public LightHealth.HealthCheck HealthCheck(string serviceKey, string value)
-            {
-                throw new NotImplementedException();
-            }
-
             public void Initialize()
             {
                 throw new NotImplementedException();

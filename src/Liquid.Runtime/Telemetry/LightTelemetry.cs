@@ -85,16 +85,5 @@ namespace Liquid.Runtime.Telemetry
         /// Whenever a SetContext is declared it is necessary to terminate its operations, that is, 
         ///when completing all the operations trace, it is necessary to reconfigure all telemetry client changes in order to avoid any data inconsistencies.
         public abstract void DequeueContext();
-
-        /// <summary>
-        /// Abstract method to force inherithed class to implement Health Check Method.
-        /// </summary>
-        /// <param name="serviceKey"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public abstract LightHealth.HealthCheck HealthCheck(string serviceKey, string value);
     }
-     
 }
-
-
