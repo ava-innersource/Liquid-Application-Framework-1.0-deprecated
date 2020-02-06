@@ -8,11 +8,7 @@ namespace Liquid.Runtime.Tests
 {
     public class SecretsConfigurationTest
     {
-
-        private static readonly IFixture _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
-
-
-
+        
         [Fact]
         public void WhenEnabledModuleShouldBeMandatory()
         {
