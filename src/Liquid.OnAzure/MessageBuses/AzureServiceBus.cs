@@ -47,7 +47,7 @@ namespace Liquid.OnAzure
         /// <typeparam name="T">Type of message to send</typeparam>
         /// <param name="message">Object of message to send</param>
         /// <returns>The task of Process topic</returns> 
-        public override async Task SendToQueue<T>(T message)
+        public override async Task SendToQueue(object message)
         {
             QueueClient queueClient;
             queueClient = new QueueClient(ConnectionString, _queueName);
@@ -55,7 +55,7 @@ namespace Liquid.OnAzure
             var messageData = new Message(messageSerialize)
             {
                 ContentType = "application/json;charset=utf-8",
-                Label = typeof(T).ToString(),
+                Label = message?.GetType().ToString(),
                 MessageId = Guid.NewGuid().ToString(),
                 TimeToLive = TimeSpan.FromMinutes(2)
             };
@@ -69,14 +69,14 @@ namespace Liquid.OnAzure
         /// <typeparam name="T">Type of message to send</typeparam>
         /// <param name="message">Object of message to send</param>
         /// <returns>The task of Process topic</returns> 
-        public override async Task SendToTopic<T>(T message)
+        public override async Task SendToTopic(object message)
         {
             TopicClient topicClient;
             topicClient = new TopicClient(ConnectionString, _queueName);
             var messageData = new Message(Encoding.UTF8.GetBytes(message.ToStringCamelCase()))
             {
                 ContentType = "application/json;charset=utf-8",
-                Label = typeof(T).ToString(),
+                Label = message?.GetType().ToString(),
                 MessageId = Guid.NewGuid().ToString(),
                 TimeToLive = TimeSpan.FromMinutes(2)
             };

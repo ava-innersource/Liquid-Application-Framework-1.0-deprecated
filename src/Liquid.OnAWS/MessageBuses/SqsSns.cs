@@ -50,7 +50,7 @@ namespace Liquid.OnAWS
         /// <typeparam name="T">Type of message to send</typeparam>
         /// <param name="message">Object of message to send</param>
         /// <returns>The task of Process topic</returns> 
-        public override async Task SendToQueue<T>(T message)
+        public override async Task SendToQueue(object message)
         {
             SqsSnsConfiguration config = GetConnection(_queueName);
             AmazonSQSClient sqsClient = new AmazonSQSClient(config.AwsAccessKeyId, config.AwsSecretAccessKey);
@@ -76,7 +76,7 @@ namespace Liquid.OnAWS
         /// <typeparam name="T">Type of message to send</typeparam>
         /// <param name="message">Object of message to send</param>
         /// <returns>The task of Process topic</returns> 
-        public override async Task SendToTopic<T>(T message)
+        public override async Task SendToTopic(object message)
         {
             SqsSnsConfiguration config = GetConnection(_queueName);
             AmazonSimpleNotificationServiceClient snsClient = new AmazonSimpleNotificationServiceClient();

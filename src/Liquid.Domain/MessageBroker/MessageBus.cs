@@ -29,9 +29,9 @@ namespace Liquid.Domain
         /// <typeparam name="U">type of Message</typeparam>
         /// <param name="message">Messade Object</param>
         /// <returns>Task</returns>
-        public Task SendToQueue<U>(U message) where U : ILightMessage
+        public Task SendToQueue(object message) 
         { 
-            return _process.SendToQueue<U>(message);
+            return _process.SendToQueue(message);
         }
 
         /// <summary>
@@ -40,9 +40,9 @@ namespace Liquid.Domain
         /// <typeparam name="U">tyep of Message</typeparam>
         /// <param name="message">Messade Object</param>
         /// <returns>Task</returns>
-        public Task SendToTopic<U>(U message) where U : ILightMessage
+        public Task SendToTopic(object message) 
         {
-            return _process.SendToTopic<U>(message);
+            return _process.SendToTopic(message);
         }
     }
 }
