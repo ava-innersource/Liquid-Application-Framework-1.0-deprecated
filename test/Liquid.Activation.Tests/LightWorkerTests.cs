@@ -1,0 +1,154 @@
+// Copyright (c) Avanade Inc. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using System.Threading.Tasks;
+using Liquid.Base;
+using Liquid.Interfaces;
+using Newtonsoft.Json;
+using NSubstitute;
+using Xunit;
+
+namespace Liquid.Activation.Tests
+{
+    public class LightWorkerTests
+    {
+        public LightWorkerTests()
+        {
+            Workbench.Instance.Reset();
+            Workbench.Instance.AddToCache(WorkbenchServiceType.Telemetry, Substitute.For<ILightTelemetry>());
+        }
+
+        [Fact]
+        public void InitializeWhenMockLightWorkerPresentThenQueueAndTopicsAreDiscovered()
+        {
+            var sut = new MockLightWorker();
+            sut.Initialize();
+
+            Assert.Contains(
+                MockLightWorker.TopicList,
+                _ => _.MethodInfo.ReflectedType == typeof(MockLightWorker)
+                && _.MethodInfo.Name == nameof(MockLightWorker.TopicMethod));
+
+            Assert.Contains(
+                MockLightWorker.QueueList,
+                _ => _.MethodInfo.ReflectedType == typeof(MockLightWorker)
+                && _.MethodInfo.Name == nameof(MockLightWorker.QueueMethod));
+
+            // Given the static nature of LightWorker, we couldn't make this an isolated assertion
+            // TODO: Refactor LightWorker and then make this isolated
+            Assert.Throws<LightException>(() => new MockLightWorker().Initialize());
+        }
+
+        [Fact]
+        public void InvokeProcessWhenMessageIsntValidJsonThrows()
+        {
+            var actual = LightWorker.InvokeProcess(null, null);
+            Assert.Null(actual);
+        }
+
+        [Fact]
+        public void InvokeProcessWhenMessageIsValidJsonParsesItCorrectly()
+        {
+            // ARRANGE
+            var anonymous = new Foobar { Foo = "Bar" };
+            var anonymousAsByteStream = ToJsonByteStream(anonymous);
+
+            var method = typeof(MethodsCollection).GetMethod(nameof(MethodsCollection.FoobarMethod));
+
+            // ACT
+            var actual = (Foobar)LightWorker.InvokeProcess(method, anonymousAsByteStream);
+
+            // ASSERT
+            Assert.Equal(anonymous.Foo, actual.Foo);
+        }
+
+        [Fact]
+        public void InvokeProcessWhenMethodHasZeroParametersDoesntParseMessage()
+        {
+            // ARRANGE
+            var mi = typeof(MethodsCollection).GetMethod(nameof(MethodsCollection.ConstantMethod));
+
+            // ACT
+            var actual = (string)LightWorker.InvokeProcess(mi, null);
+
+            // ASSERT
+            Assert.Equal(MethodsCollection.Value, actual);
+        }
+
+        [Fact]
+        public void InvokeProcessWhenMethodThrowsAsyncThrows()
+        {
+            // ARRANGE
+            var mi = typeof(MethodsCollection).GetMethod(nameof(MethodsCollection.ThrowsAsync));
+
+            var anonymous = new Foobar { Foo = "Bar" };
+            var anonymousAsByteStream = ToJsonByteStream(anonymous);
+
+            // ACT & ASSERT
+            Assert.ThrowsAsync<MethodsCollection.TestException>(() => (Task)LightWorker.InvokeProcess(mi, anonymousAsByteStream));
+        }
+
+        /// <summary>
+        /// Serialize any object to a JSON string and then convert it to a bytestream.
+        /// </summary>
+        /// <param name="obj">The object to serialize.</param>
+        /// <returns>A byestream containing the object as UTF8 bytes.</returns>
+        private byte[] ToJsonByteStream(object obj)
+        {
+            var anonymousAsString = JsonConvert.SerializeObject(obj);
+            var anonymousAsByteStream = Encoding.UTF8.GetBytes(anonymousAsString);
+
+            return anonymousAsByteStream;
+        }
+
+        [SuppressMessage(
+           "Design",
+           "CA1034:Nested types should not be visible",
+           Justification = "Must be public so LightWorker access the class")]
+        public class Foobar
+        {
+            public string Foo { get; set; } = "Bar";
+        }
+
+        private class MethodsCollection
+        {
+            public const string Value = "string";
+
+            public string ConstantMethod()
+            {
+                return Value;
+            }
+
+            public Foobar FoobarMethod(Foobar foobar)
+            {
+                return foobar;
+            }
+
+            public Task ThrowsAsync(Foobar foobar)
+            {
+                return Task.FromException(new TestException(string.Empty));
+            }
+
+            // Used to test throwing from a method
+            public class TestException : Exception
+            {
+                public TestException(string message)
+                    : base(message)
+                {
+                }
+
+                public TestException(string message, Exception innerException)
+                    : base(message, innerException)
+                {
+                }
+
+                public TestException()
+                {
+                }
+            }
+        }
+    }
+}
