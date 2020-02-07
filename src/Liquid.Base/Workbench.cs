@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Liquid.Base.Interfaces.Polly;
 using Liquid.Interfaces;
@@ -14,6 +15,10 @@ namespace Liquid
     /// Provides a global way to configure a Liquid application.
     /// </summary>
     [Obsolete("Please use the correct spelled class, Liquid.Base.Workbench")]
+    [SuppressMessage(
+        "StyleCop.CSharp.MaintainabilityRules",
+        "SA1402:File may only contain a single type",
+        Justification = "Obsolete class will be removed.")]
     public static class WorkBench
     {
         public static ILightRepository Repository => Workbench.Instance.Repository;
