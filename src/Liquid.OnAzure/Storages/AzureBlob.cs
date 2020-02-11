@@ -187,7 +187,7 @@ namespace Liquid.OnAzure
             _containerReference.SetPermissionsAsync(new BlobContainerPermissions
             {
                 PublicAccess = accessType
-            });
+            }).GetAwaiter().GetResult();
         }
     }
 }
