@@ -1,3 +1,4 @@
+using Liquid.Base;
 using Liquid.Interfaces;
 using Liquid.Repository;
 using Liquid.Runtime.Configuration.Base;
@@ -65,7 +66,6 @@ namespace Liquid.OnAzure
         /// </summary>        
         public AzureBlob()
         {
-
         }
 
         /// <summary>
@@ -182,6 +182,11 @@ namespace Liquid.OnAzure
             if (!Enum.TryParse<BlobContainerPublicAccessType>(_permission, out var accessType))
             {
                 accessType = BlobContainerPublicAccessType.Blob;
+            }
+
+            if (accessType == BlobContainerPublicAccessType.Unknown)
+            {
+                throw new LightException($"AzureBlob configuration \"{nameof(Permission)}\" can't be \"Unknown\".");
             }
 
             _containerReference.SetPermissionsAsync(new BlobContainerPermissions

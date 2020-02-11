@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
+using Liquid.Base;
 using Liquid.Interfaces;
 using Liquid.Repository;
 using Liquid.Tests;
@@ -16,6 +17,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using NSubstitute;
 using Xunit;
+using Xunit.Extensions;
 
 namespace Liquid.OnAzure.Tests
 {
@@ -67,7 +69,7 @@ namespace Liquid.OnAzure.Tests
             new object[] { BlobContainerPublicAccessType.Blob.ToString(),  BlobContainerPublicAccessType.Blob },
             new object[] { BlobContainerPublicAccessType.Off.ToString(), BlobContainerPublicAccessType.Off },
             new object[] { BlobContainerPublicAccessType.Container.ToString(), BlobContainerPublicAccessType.Container},
-            new object[] { BlobContainerPublicAccessType.Unknown.ToString(), BlobContainerPublicAccessType.Unknown },
+            //new object[] { BlobContainerPublicAccessType.Unknown.ToString(), BlobContainerPublicAccessType.Unknown },
             new object[] { _fixture.Create<string>(), BlobContainerPublicAccessType.Blob },
         };
 
@@ -126,14 +128,12 @@ namespace Liquid.OnAzure.Tests
         }
 
         [Theory]
-        [InlineData(BlobContainerPublicAccessType.Blob, BlobContainerPublicAccessType.Blob)]
-        [InlineData(BlobContainerPublicAccessType.Off, BlobContainerPublicAccessType.Off)]
-        [InlineData(BlobContainerPublicAccessType.Container, BlobContainerPublicAccessType.Container)]
-        public async Task CtorWhenContainersDoesntExistsCreatesNew(BlobContainerPublicAccessType accessType, BlobContainerPublicAccessType expected)
+        [MemberData(nameof(CtorWhenContainersDoesntExistsCreatesNewData))]
+        public async Task CtorWhenContainersDoesntExistsCreatesNew(string accessType, BlobContainerPublicAccessType expected)
         {
             // ARRANGE
             const string containerName = "removecontainer";
-            var connectionString = "UseDevelopmentStorage=true";
+            const string connectionString = "UseDevelopmentStorage=true";
 
             var client = CloudStorageAccount.Parse(connectionString).CreateCloudBlobClient();
             var container = client.GetContainerReference(containerName);
@@ -144,7 +144,7 @@ namespace Liquid.OnAzure.Tests
             {
                 ConnectionString = connectionString,
                 Container = containerName,
-                Permission = accessType.ToString(),
+                Permission = accessType,
             };
 
             // ACT
@@ -158,6 +158,29 @@ namespace Liquid.OnAzure.Tests
             var blobContainerPermissions = await container.GetPermissionsAsync();
 
             Assert.Equal(expected, blobContainerPermissions.PublicAccess);
+        }
+
+        [Fact]
+        public async Task CtorWhenPermissionIsUnknownThrows()
+        {
+            // ARRANGE
+            const string containerName = "removecontainer";
+            const string connectionString = "UseDevelopmentStorage=true";
+
+            var client = CloudStorageAccount.Parse(connectionString).CreateCloudBlobClient();
+            var container = client.GetContainerReference(containerName);
+
+            await container.DeleteIfExistsAsync();
+
+            var configuration = new MediaStorageConfiguration
+            {
+                ConnectionString = connectionString,
+                Container = containerName,
+                Permission = BlobContainerPublicAccessType.Unknown.ToString(),
+            };
+
+            // ACT & ASSERT
+            Assert.Throws<LightException>(() => new AzureBlob(configuration));
         }
 
         [Theory, AutoSubstituteData]
