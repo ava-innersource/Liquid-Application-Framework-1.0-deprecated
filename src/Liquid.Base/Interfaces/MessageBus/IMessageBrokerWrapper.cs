@@ -7,7 +7,7 @@ namespace Liquid.Interfaces
     public interface IMessageBrokerWrapper
     {
         void Initialize(string tagConfigName, string name);
-        Task SendToQueue<T>(T message) where T : ILightMessage;
-        Task SendToTopic<T>(T message) where T : ILightMessage;
+        Task SendToQueue(object message);
+        Task SendToTopic(object message);
     }
 }

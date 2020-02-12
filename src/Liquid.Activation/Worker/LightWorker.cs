@@ -146,23 +146,6 @@ namespace Liquid.Activation
                 else
                 {
                     dynamic lightMessage = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(message), parameters[0].ParameterType);
-                    //Check if it needs authorization, unless that there isn't AuthorizeAttribute
-                    foreach (AuthorizeAttribute authorize in method.GetCustomAttributes(typeof(AuthorizeAttribute), false))
-                    {
-                        if ((lightMessage.Context == null) || ((lightMessage.Context != null) && (lightMessage.Context.User == null)))
-                        {
-                            //If there isn't Context, will be throw exception.
-                            throw new LightException($"No TokenJwt has been informed on the message sent to the worker.");
-                        }
-                        if ((authorize.Policy != null) && (lightMessage.Context.User.FindFirst(authorize.Policy) == null))
-                        {
-                            throw new LightException($"No Policy \"{authorize.Policy}\" has been informed on the message sent to the worker.");
-                        }
-                        if ((authorize.Roles != null) && (!lightMessage.Context.User.IsInRole(authorize.Roles)))
-                        {
-                            throw new LightException($"No Roles \"{authorize.Roles}\" has been informed on the message sent to the worker.");
-                        }
-                    }
 
                     object[] parametersArray = new object[] { lightMessage };
                     result = method.Invoke(classInstance, parametersArray);
