@@ -46,7 +46,7 @@ namespace Liquid.OnWindowsClient
         /// <typeparam name="T">Type of message to send</typeparam>
         /// <param name="message">Object of message to send</param>
         /// <returns>The task of Process topic</returns> 
-        public override async Task SendToQueue<T>(T message)
+        public override Task SendToQueue(object message)
         {
             throw new NotImplementedException(); 
         }
@@ -57,7 +57,7 @@ namespace Liquid.OnWindowsClient
         /// <typeparam name="T">Type of message to send</typeparam>
         /// <param name="message">Object of message to send</param>
         /// <returns>The task of Process topic</returns> 
-        public override async Task SendToTopic<T>(T message)
+        public override Task SendToTopic(object message)
         {
             throw new NotImplementedException(); 
         }

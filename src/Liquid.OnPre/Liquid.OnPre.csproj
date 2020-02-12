@@ -35,11 +35,6 @@
     <ProjectReference Include="..\Liquid.Runtime\Liquid.Runtime.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Hubs\" />
-    <Folder Include="Storages\" />
-    <Folder Include="Telemetry\" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.3" />
     <PackageReference Include="System.Runtime.Caching" Version="4.6.0-preview6.19303.8" />
   </ItemGroup>
