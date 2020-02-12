@@ -179,7 +179,7 @@ namespace Liquid.OnAzure
             _containerReference = GetBlobClientFromConnection().GetContainerReference(containerName);
             _containerReference.CreateIfNotExistsAsync().GetAwaiter().GetResult();
 
-            if (!Enum.TryParse<BlobContainerPublicAccessType>(_permission, out var accessType))
+            if (!EnumExtensions.SafeTryParse<BlobContainerPublicAccessType>(_permission, out var accessType))
             {
                 accessType = BlobContainerPublicAccessType.Blob;
             }

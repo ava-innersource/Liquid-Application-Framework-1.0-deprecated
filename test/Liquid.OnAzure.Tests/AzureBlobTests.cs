@@ -17,14 +17,14 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using NSubstitute;
 using Xunit;
-using Xunit.Extensions;
 
 namespace Liquid.OnAzure.Tests
 {
     public class AzureBlobTests : IDisposable
     {
         private const string ContentType = "text/plain";
-
+        private const string DefaultConnectionString = "UseDevelopmentStorage=true";
+        private const string DefaultContainerName = "removecontainer";
         private static readonly IFixture _fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
 
         private static readonly ILightRepository _fakeLightRepository = Substitute.For<ILightRepository>();
@@ -45,7 +45,7 @@ namespace Liquid.OnAzure.Tests
 
             _sut = new AzureBlob(new MediaStorageConfiguration
             {
-                ConnectionString = "UseDevelopmentStorage=true",
+                ConnectionString = DefaultConnectionString,
                 Container = _fixture.Create<string>().ToLower(CultureInfo.CurrentCulture),
             });
 
@@ -69,7 +69,6 @@ namespace Liquid.OnAzure.Tests
             new object[] { BlobContainerPublicAccessType.Blob.ToString(),  BlobContainerPublicAccessType.Blob },
             new object[] { BlobContainerPublicAccessType.Off.ToString(), BlobContainerPublicAccessType.Off },
             new object[] { BlobContainerPublicAccessType.Container.ToString(), BlobContainerPublicAccessType.Container},
-            //new object[] { BlobContainerPublicAccessType.Unknown.ToString(), BlobContainerPublicAccessType.Unknown },
             new object[] { _fixture.Create<string>(), BlobContainerPublicAccessType.Blob },
         };
 
@@ -132,18 +131,15 @@ namespace Liquid.OnAzure.Tests
         public async Task CtorWhenContainersDoesntExistsCreatesNew(string accessType, BlobContainerPublicAccessType expected)
         {
             // ARRANGE
-            const string containerName = "removecontainer";
-            const string connectionString = "UseDevelopmentStorage=true";
-
-            var client = CloudStorageAccount.Parse(connectionString).CreateCloudBlobClient();
-            var container = client.GetContainerReference(containerName);
+            var client = CloudStorageAccount.Parse(DefaultConnectionString).CreateCloudBlobClient();
+            var container = client.GetContainerReference(DefaultContainerName);
 
             await container.DeleteIfExistsAsync();
 
             var configuration = new MediaStorageConfiguration
             {
-                ConnectionString = connectionString,
-                Container = containerName,
+                ConnectionString = DefaultConnectionString,
+                Container = DefaultContainerName,
                 Permission = accessType,
             };
 
@@ -151,7 +147,7 @@ namespace Liquid.OnAzure.Tests
             _ = new AzureBlob(configuration);
 
             // ASSERT
-            container = client.GetContainerReference(containerName);
+            container = client.GetContainerReference(DefaultContainerName);
 
             Assert.True(await container.ExistsAsync());
 
@@ -164,18 +160,15 @@ namespace Liquid.OnAzure.Tests
         public async Task CtorWhenPermissionIsUnknownThrows()
         {
             // ARRANGE
-            const string containerName = "removecontainer";
-            const string connectionString = "UseDevelopmentStorage=true";
-
-            var client = CloudStorageAccount.Parse(connectionString).CreateCloudBlobClient();
-            var container = client.GetContainerReference(containerName);
+            var client = CloudStorageAccount.Parse(DefaultConnectionString).CreateCloudBlobClient();
+            var container = client.GetContainerReference(DefaultContainerName);
 
             await container.DeleteIfExistsAsync();
 
             var configuration = new MediaStorageConfiguration
             {
-                ConnectionString = connectionString,
-                Container = containerName,
+                ConnectionString = DefaultConnectionString,
+                Container = DefaultContainerName,
                 Permission = BlobContainerPublicAccessType.Unknown.ToString(),
             };
 
@@ -183,21 +176,48 @@ namespace Liquid.OnAzure.Tests
             Assert.Throws<LightException>(() => new AzureBlob(configuration));
         }
 
-        [Theory, AutoSubstituteData]
-        public async Task CtorWhenContainersDoesntExistsAndAccessTypeIsAnyStringCreatesWithAccessTypeBlob(string accessType)
+        [Fact]
+        public async Task CtorWhenPermissionIsOutOfRangeNumberThenPermissionIsBlob()
         {
-            const string containerName = "removecontainer";
-            var connectionString = "UseDevelopmentStorage=true";
-
-            var client = CloudStorageAccount.Parse(connectionString).CreateCloudBlobClient();
-            var container = client.GetContainerReference(containerName);
+            // ARRANGE
+            var client = CloudStorageAccount.Parse(DefaultConnectionString).CreateCloudBlobClient();
+            var container = client.GetContainerReference(DefaultContainerName);
 
             await container.DeleteIfExistsAsync();
 
             var configuration = new MediaStorageConfiguration
             {
-                ConnectionString = connectionString,
-                Container = containerName,
+                ConnectionString = DefaultConnectionString,
+                Container = DefaultContainerName,
+                Permission = "100",
+            };
+
+            // ACT
+            _ = new AzureBlob(configuration);
+
+            // ASSERT
+            container = client.GetContainerReference(DefaultContainerName);
+
+            Assert.True(await container.ExistsAsync());
+
+            var blobContainerPermissions = await container.GetPermissionsAsync();
+
+            Assert.Equal(BlobContainerPublicAccessType.Blob, blobContainerPermissions.PublicAccess);
+        }
+
+        [Theory, AutoSubstituteData]
+        public async Task CtorWhenContainersDoesntExistsAndAccessTypeIsAnyStringCreatesWithAccessTypeBlob(string accessType)
+        {
+            // ARRANGE 
+            var client = CloudStorageAccount.Parse(DefaultConnectionString).CreateCloudBlobClient();
+            var container = client.GetContainerReference(DefaultContainerName);
+
+            await container.DeleteIfExistsAsync();
+
+            var configuration = new MediaStorageConfiguration
+            {
+                ConnectionString = DefaultConnectionString,
+                Container = DefaultContainerName,
                 Permission = accessType,
             };
 
@@ -205,7 +225,7 @@ namespace Liquid.OnAzure.Tests
             _ = new AzureBlob(configuration);
 
             // ASSERT
-            container = client.GetContainerReference(containerName);
+            container = client.GetContainerReference(DefaultContainerName);
 
             Assert.True(await container.ExistsAsync());
 
@@ -217,21 +237,20 @@ namespace Liquid.OnAzure.Tests
         [Fact]
         public async Task CtorWhenContainersDoesntExistsAndAccessTypeIsUnknownThrows()
         {
-            const string containerName = "removecontainer";
-            var connectionString = "UseDevelopmentStorage=true";
-
-            var client = CloudStorageAccount.Parse(connectionString).CreateCloudBlobClient();
-            var container = client.GetContainerReference(containerName);
+            // ARRANGE
+            var client = CloudStorageAccount.Parse(DefaultConnectionString).CreateCloudBlobClient();
+            var container = client.GetContainerReference(DefaultContainerName);
 
             await container.DeleteIfExistsAsync();
 
             var configuration = new MediaStorageConfiguration
             {
-                ConnectionString = connectionString,
-                Container = containerName,
+                ConnectionString = DefaultConnectionString,
+                Container = DefaultContainerName,
                 Permission = BlobContainerPublicAccessType.Unknown.ToString(),
             };
 
+            // ACT & ASSERT
             Assert.ThrowsAny<Exception>(() => new AzureBlob(configuration));
         }
 
