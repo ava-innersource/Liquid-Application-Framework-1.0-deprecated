@@ -16,17 +16,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Hubs\**" />
-    <Compile Remove="Storages\**" />
-    <Compile Remove="Telemetry\**" />
-    <EmbeddedResource Remove="Hubs\**" />
-    <EmbeddedResource Remove="Storages\**" />
-    <EmbeddedResource Remove="Telemetry\**" />
-    <None Remove="Hubs\**" />
-    <None Remove="Storages\**" />
-    <None Remove="Telemetry\**" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Liquid.Base\Liquid.Base.csproj" />
     <ProjectReference Include="..\Liquid.Domain\Liquid.Domain.csproj" />
     <ProjectReference Include="..\Liquid.Activation\Liquid.Activation.csproj" />
