@@ -16,11 +16,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="ServiceBus\**" />
-    <EmbeddedResource Remove="ServiceBus\**" />
-    <None Remove="ServiceBus\**" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.3" />
   </ItemGroup>
   <ItemGroup>
