@@ -198,7 +198,7 @@ namespace Liquid.OnAzure.Tests
         public void TopicMessageHandlerWhenMethodThrowsInvalidInputExceptionThenMessageIsDeadLettered(string body)
         {
             // ARRANGE
-            TopicWorker.WhatToDo = _ => throw new BusinessValidationException(new List<string>());
+            TopicWorker.WhatToDo = _ => throw new InvalidInputException(new List<string>());
 
             _subscriptionClient
                 .When(_ => _.RegisterMessageHandler(Arg.Any<Func<Message, CancellationToken, Task>>(), Arg.Any<MessageHandlerOptions>()))
