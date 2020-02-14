@@ -13,6 +13,7 @@ namespace Liquid.Repository
         {
             RuleFor(d => ConnectionString).NotEmpty().WithMessage($"'{nameof(ConnectionString)}' on MediaStorage settings should not be empty.");
             RuleFor(d => Container).NotEmpty().WithMessage($"'{nameof(Container)}' on MediaStorage settings should not be empty.");
+            RuleFor(d => Permission).NotEqual("Unknown").WithMessage("{PropertyName} on MediaStorage settings can't be Unknown");
         }
     }
 }
