@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Tasks;
+using AutoFixture;
 using Liquid.Base;
 using Liquid.Interfaces;
 using Newtonsoft.Json;
@@ -15,6 +16,8 @@ namespace Liquid.Activation.Tests
 {
     public class LightWorkerTests
     {
+        private readonly Fixture _fixture = new Fixture();
+
         public LightWorkerTests()
         {
             Workbench.Instance.Reset();
@@ -42,11 +45,57 @@ namespace Liquid.Activation.Tests
             Assert.Throws<LightException>(() => new MockLightWorker().Initialize());
         }
 
-        [Fact]
-        public void InvokeProcessWhenMessageIsntValidJsonThrows()
+        [Theory]
+        [InlineData("anything")]
+        [InlineData(null)]
+        [InlineData(1)]
+        public void InvokeProcessWhenMethodIsNullReturnsExpectedValue(object message)
         {
-            var actual = LightWorker.InvokeProcess(null, null);
+            MethodsCollection.Value = _fixture.Create<string>();
+
+            var method = typeof(MethodsCollection).GetMethod(nameof(MethodsCollection.ConstantMethod));
+
+            var actual = LightWorker.InvokeProcess(method, ToJsonByteStream(message));
+
+            Assert.Equal(MethodsCollection.Value, actual);
+        }
+
+        [Fact]
+        public void InvokeProcessWhenMethodIsEchoMessageIsEmptyReturnsNull()
+        {
+            var method = typeof(MethodsCollection).GetMethod(nameof(MethodsCollection.EchoMethod));
+
+            var actual = LightWorker.InvokeProcess(method, Array.Empty<byte>());
+
             Assert.Null(actual);
+        }
+
+        [Fact]
+        public void InvokeProcessWhenMethodHasOneParametersAndMessageIsntValidJsonThrows()
+        {
+            var method = typeof(MethodsCollection).GetMethod(nameof(MethodsCollection.EchoMethod));
+
+            var message = ToJsonByteStream("anything");
+
+            message[0] = _fixture.Create<byte>();
+
+            Assert.ThrowsAny<Exception>(() => LightWorker.InvokeProcess(method, message));
+        }
+
+        [Fact]
+        public void InvokeProcessWhenMethodHasZeroParametersAndMessageIsntValidReturnsExpectedValue()
+        {
+            var method = typeof(MethodsCollection).GetMethod(nameof(MethodsCollection.ConstantMethod));
+
+            var message = ToJsonByteStream("anything");
+
+            message[0] = _fixture.Create<byte>();
+
+            MethodsCollection.Value = _fixture.Create<string>();
+
+            var actual = LightWorker.InvokeProcess(method, message);
+
+            Assert.Equal(MethodsCollection.Value, actual);
         }
 
         [Fact]
@@ -56,7 +105,7 @@ namespace Liquid.Activation.Tests
             var anonymous = new Foobar { Foo = "Bar" };
             var anonymousAsByteStream = ToJsonByteStream(anonymous);
 
-            var method = typeof(MethodsCollection).GetMethod(nameof(MethodsCollection.FoobarMethod));
+            var method = typeof(MethodsCollection).GetMethod(nameof(MethodsCollection.EchoMethod));
 
             // ACT
             var actual = (Foobar)LightWorker.InvokeProcess(method, anonymousAsByteStream);
@@ -115,14 +164,14 @@ namespace Liquid.Activation.Tests
 
         private class MethodsCollection
         {
-            public const string Value = "string";
+            public static string Value { get; set; } = "string";
 
             public string ConstantMethod()
             {
                 return Value;
             }
 
-            public Foobar FoobarMethod(Foobar foobar)
+            public Foobar EchoMethod(Foobar foobar)
             {
                 return foobar;
             }
