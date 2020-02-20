@@ -127,7 +127,7 @@ namespace Liquid.OnAzure
         private DocumentCollection newDocumentCollection(string collection)
         {
             DocumentCollection documentCollection = new DocumentCollection { Id = collection };
-            documentCollection.PartitionKey.Paths.Add("/" + collection);
+            documentCollection.PartitionKey.Paths.Add("/id");
             IndexingPolicy indexingPolicy = new IndexingPolicy(new RangeIndex(DataType.String) { Precision = -1 });
             documentCollection.IndexingPolicy = indexingPolicy;
             documentCollection.IndexingPolicy.IndexingMode = IndexingMode.Consistent;
@@ -246,7 +246,7 @@ namespace Liquid.OnAzure
 
             try
             {
-                DocResp = _client.ReadDocumentAsync<Document>(UriFactory.CreateDocumentUri(_databaseId, (await collection).Id, entityId), new RequestOptions() { PartitionKey = new PartitionKey(Undefined.Value) }).Result;
+                DocResp = await _client.ReadDocumentAsync<Document>(UriFactory.CreateDocumentUri(_databaseId, (await collection).Id, entityId), new RequestOptions() { PartitionKey = new PartitionKey(entityId) });
             }
             catch (AggregateException ae)
             {
@@ -419,7 +419,7 @@ namespace Liquid.OnAzure
             if (_mediaStorage != null)
             {
                 attachmentDB.MediaLink = null;
-                await _client.UpsertAttachmentAsync(doc.SelfLink, attachmentDB, new RequestOptions() { PartitionKey = new PartitionKey(Undefined.Value) });
+                await _client.UpsertAttachmentAsync(doc.SelfLink, attachmentDB, new RequestOptions() { PartitionKey = new PartitionKey(entityId) });
                 await _mediaStorage.InsertUpdateAsync(upserted);                       
             }
             else
@@ -503,7 +503,7 @@ namespace Liquid.OnAzure
 
             _typeToCollectionMap.TryGetValue(typeof(T), out var _collection);
 
-            FeedOptions options = new FeedOptions { EnableCrossPartitionQuery = true, PartitionKey = new PartitionKey(Undefined.Value) };
+            FeedOptions options = new FeedOptions { EnableCrossPartitionQuery = true };
 
             return _client.CreateDocumentQuery<T>((await _collection).SelfLink, options).Count();
         }
@@ -518,10 +518,14 @@ namespace Liquid.OnAzure
         public override async Task<int> CountAsync<T>(Expression<Func<T, bool>> predicate)
         {
             await base.CountAsync<T>(predicate); //Calls the base class because there may be some generic behavior in it
-            FeedOptions options = new FeedOptions { EnableCrossPartitionQuery = true, PartitionKey = new PartitionKey(Undefined.Value) };
+            FeedOptions options = new FeedOptions { EnableCrossPartitionQuery = true };
             _typeToCollectionMap.TryGetValue(typeof(T), out var _collection);
-
-            return _client.CreateDocumentQuery<T>((await _collection).SelfLink, options).Where(predicate).Count();
+            IQueryable<T> queryBase = _client.CreateDocumentQuery<T>((await _collection).SelfLink, options);
+            if (predicate != null)
+            {
+                queryBase = queryBase.Where(predicate);
+            }
+            return queryBase.Count();
         }
 
         /// <summary>
@@ -563,19 +567,19 @@ namespace Liquid.OnAzure
             try
             {
                 var uri = UriFactory.CreateDocumentUri(_databaseId, (await collection).Id, entityId);
-                var doc = _client.ReadDocumentAsync<Document>(uri, new RequestOptions() { PartitionKey = new PartitionKey(Undefined.Value) }).Result;
+                var doc = _client.ReadDocumentAsync<Document>(uri, new RequestOptions() { PartitionKey = new PartitionKey(entityId) }).Result;
 
                 if (doc != null)
                 {
                     if (_mediaStorage != null)
                     {
-                        foreach (Attachment attachment in _client.CreateAttachmentQuery(doc.Document.SelfLink, new FeedOptions() { PartitionKey = new PartitionKey(Undefined.Value) }))
+                        foreach (Attachment attachment in _client.CreateAttachmentQuery(doc.Document.SelfLink, new FeedOptions() { PartitionKey = new PartitionKey(entityId) }))
                         {
                             await DeleteAttachmentAsync<T>(entityId, attachment.Id);
                         }
                     }
 
-                    await _client.DeleteDocumentAsync(doc.Document.SelfLink, new RequestOptions() { PartitionKey = new PartitionKey(Undefined.Value) });
+                    await _client.DeleteDocumentAsync(doc.Document.SelfLink, new RequestOptions() { PartitionKey = new PartitionKey(entityId) });
 
                     // Call LightEvent to raise events from LightModel's attributes
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
@@ -630,7 +634,7 @@ namespace Liquid.OnAzure
 
             List<T> list = new List<T>();
             string continuationToken = null;
-            FeedOptions options = new FeedOptions { MaxItemCount = itemsPerPage, EnableCrossPartitionQuery = true, PartitionKey = new PartitionKey(Undefined.Value), RequestContinuation = token };
+            FeedOptions options = new FeedOptions { MaxItemCount = itemsPerPage, EnableCrossPartitionQuery = true, RequestContinuation = token };
             IQueryable<T> queryBase = _client.CreateDocumentQuery<T>((await _collection).DocumentsLink, options);
 
             if (filter != null) queryBase = queryBase.Where(filter);
@@ -676,11 +680,11 @@ namespace Liquid.OnAzure
 
             List<T> list = new List<T>();
             string continuationToken = null;
-            FeedOptions options = new FeedOptions { MaxItemCount = itemsPerPage, EnableCrossPartitionQuery = true, PartitionKey = new PartitionKey(Undefined.Value) };
+            FeedOptions options = new FeedOptions { MaxItemCount = itemsPerPage, EnableCrossPartitionQuery = true };
             IQueryable<T> queryBase = _client.CreateDocumentQuery<T>((await _collection).DocumentsLink, options);
 
             if (filter != null) queryBase = queryBase.Where(filter);
-
+            
             var finalQuery = queryBase.AsDocumentQuery();
 
             int queryPage = 0;
