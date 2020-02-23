@@ -2,11 +2,16 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using AutoFixture;
 using Liquid.Base;
+using Liquid.Base.Domain;
+using Liquid.Domain;
 using Liquid.Interfaces;
 using Newtonsoft.Json;
 using NSubstitute;
@@ -140,6 +145,57 @@ namespace Liquid.Activation.Tests
             Assert.ThrowsAsync<MethodsCollection.TestException>(() => (Task)LightWorker.InvokeProcess(mi, anonymousAsByteStream));
         }
 
+        [Fact]
+        public void FactoryWhenNoErrorsReturnsInstanceOfT()
+        {
+            var sut = new MockLightWorker();
+            Assert.IsAssignableFrom<MockDomain>(sut.Factory<MockDomain>());
+        }
+
+        [Fact]
+        public void FactoryWhenNoErrorsThenDomainInstanceHasTelemetrySet()
+        {
+            var sut = new MockLightWorker();
+            var actual = sut.Factory<MockDomain>();
+
+            Assert.NotNull(actual.Telemetry);
+        }
+
+        [Fact]
+        public void FactoryWhenNoErrorsThenDomainInstanceHasCacheSet()
+        {
+            var sut = new MockLightWorker();
+            var actual = sut.Factory<MockDomain>();
+
+            Assert.NotNull(actual.Cache);
+        }
+
+        [Fact]
+        public void FactoryWhenNoErrorsThenDomainInstanceHasCriticHandlerSet()
+        {
+            var sut = new MockLightWorker();
+            var actual = sut.Factory<MockDomain>();
+
+            Assert.NotNull(actual.CritictHandler);
+        }
+
+        [Fact]
+        public void FactoryWhenThereAreInputErrorsThrows()
+        {
+            // ARRANGE
+            var sut = new MockLightWorker();
+            sut.AddInputValidationErrorCode(string.Empty);
+
+            // ACT & ASSERT
+            Assert.ThrowsAny<Exception>(() => sut.Factory<MockDomain>());
+        }
+
+        [Fact]
+        public void ValidateInputWhenErrors()
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Serialize any object to a JSON string and then convert it to a bytestream.
         /// </summary>
@@ -162,6 +218,44 @@ namespace Liquid.Activation.Tests
             public string Foo { get; set; } = "Bar";
         }
 
+        [SuppressMessage(
+           "Design",
+           "CA1034:Nested types should not be visible",
+           Justification = "Must be public so LightWorker access the class")]
+        [MessageBus("asd")]
+        public class MockLightWorker : LightWorker
+        {
+            public static List<(MethodInfo MethodInfo, TopicAttribute TopicAttribute)> TopicList => _topics
+                .Select(kvp => (kvp.Key, kvp.Value))
+                .ToList();
+
+            public static List<(MethodInfo MethodInfo, QueueAttribute QueueAttribute)> QueueList => _queues
+                .Select(kvp => (kvp.Key, kvp.Value))
+                .ToList();
+
+            public new void AddInputValidationErrorCode(string errorCode)
+            {
+                base.AddInputValidationErrorCode(errorCode);
+            }
+
+            [Topic("name", "subscriptionName", 10, true)]
+            public static void TopicMethod()
+            {
+            }
+
+            [Queue("name")]
+            public static void QueueMethod()
+            {
+            }
+
+            // exposed method for testing
+            public new T Factory<T>()
+                where T : LightDomain, new()
+            {
+                return base.Factory<T>();
+            }
+        }
+
         private class MethodsCollection
         {
             public static string Value { get; set; } = "string";
@@ -176,6 +270,7 @@ namespace Liquid.Activation.Tests
                 return foobar;
             }
 
+            [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Method must have a parameter because of the test case.")]
             public Task ThrowsAsync(Foobar foobar)
             {
                 return Task.FromException(new TestException(string.Empty));
@@ -198,6 +293,10 @@ namespace Liquid.Activation.Tests
                 {
                 }
             }
+        }
+
+        private class MockDomain : LightService
+        {
         }
     }
 }
