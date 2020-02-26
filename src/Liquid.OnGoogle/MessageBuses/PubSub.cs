@@ -96,7 +96,7 @@ namespace Liquid.OnGoogle
                         catch (Exception exRegister)
                         {
                             //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-                            ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(exRegister);
+                            Workbench.Instance.Telemetry.TrackException(exRegister);
 
                             return await Task.FromResult<SubscriberClient.Reply>(SubscriberClient.Reply.Nack);
                         }                      
@@ -108,7 +108,7 @@ namespace Liquid.OnGoogle
             catch (Exception exception)
             {
                 //Use the class instead of interface because tracking exceptions directly is not supposed to be done outside AMAW (i.e. by the business code)
-                ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(exception);
+                Workbench.Instance.Telemetry.TrackException(exception);
             }
         }
 
