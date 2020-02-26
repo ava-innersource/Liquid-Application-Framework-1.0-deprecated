@@ -30,4 +30,5 @@ jobs:
         run: dotnet build
 
       - name: Test solution
-        run: dotnet test      
+        run: dotnet test /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov
+
