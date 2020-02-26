@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
@@ -48,10 +49,18 @@ namespace Liquid.OnAzure.Tests
                 .CreateClient(null, null, default(ReceiveMode))
                 .ReturnsForAnyArgs(_queueClient);
 
+            _queueClient
+                .CompleteAsync(Arg.Any<string>())
+                .Returns(Task.CompletedTask);
+
             // ARRANGE ISubscriptionClientFactory
             _subscriptionClientFactory
                 .CreateClient(null, null, null, default(ReceiveMode))
                 .ReturnsForAnyArgs(_subscriptionClient);
+
+            _subscriptionClient
+                .CompleteAsync(Arg.Any<string>())
+                .Returns(Task.CompletedTask);
 
             // ARRANGE IServiceBusConfigurationProvider
             _configurationProvider
@@ -98,6 +107,8 @@ namespace Liquid.OnAzure.Tests
         public void QueueMessageHandlerWhenMessageIsValidThenNumberOfCallsIsIncremented(string body)
         {
             // ARRANGE
+            QueueWorker.WhatToDo = _ => { };
+
             var before = QueueWorker.NumberOfCalls;
 
             _queueClient
@@ -117,12 +128,16 @@ namespace Liquid.OnAzure.Tests
             var after = QueueWorker.NumberOfCalls;
 
             Assert.Equal(before + 1, after);
+            _telemetry.DidNotReceive().TrackException(Arg.Any<Exception>());
+            _queueClient.Received().CompleteAsync(Arg.Any<string>());
         }
 
         [Theory, AutoData]
-        public void TopicMessageHandlerWhenMessageIsValidThenNumberOfCallsIsIncremented(string body)
+        public void TopicMessageHandlerWhenMessageIsValidThenNumberOfCallsIsIncrementedAsync(string body)
         {
             // ARRANGE
+            TopicWorker.WhatToDo = _ => { };
+            
             var before = TopicWorker.NumberOfCalls;
 
             _subscriptionClient
@@ -132,7 +147,7 @@ namespace Liquid.OnAzure.Tests
                     var func = callbackWithArguments.Arg<Func<Message, CancellationToken, Task>>();
                     var message = CreateMessageFromString(body);
 
-                    func(message, default(CancellationToken));
+                    func(message, default(CancellationToken)).Wait();
                 });
 
             // ACT
@@ -142,6 +157,8 @@ namespace Liquid.OnAzure.Tests
             var after = TopicWorker.NumberOfCalls;
 
             Assert.Equal(before + 1, after);
+            _telemetry.DidNotReceive().TrackException(Arg.Any<Exception>());
+            _subscriptionClient.Received().CompleteAsync(Arg.Any<string>());
         }
 
         [Theory, AutoData]
@@ -157,7 +174,7 @@ namespace Liquid.OnAzure.Tests
                     var func = callbackWithArguments.Arg<Func<Message, CancellationToken, Task>>();
                     var message = CreateMessageFromString(body);
 
-                    func(message, default(CancellationToken)).GetAwaiter().GetResult();
+                    func(message, default(CancellationToken)).Wait();
                 });
 
             // ACT
@@ -217,6 +234,54 @@ namespace Liquid.OnAzure.Tests
             _subscriptionClient
                 .Received(1)
                 .DeadLetterAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>());
+        }
+
+        [Fact]
+        public void ProcessQueueWhenErrorSettingUpSubscriptionExceptionIsTracked()
+        {
+            // ARRANGE
+            _queueClient
+                .When(_ => _.RegisterMessageHandler(Arg.Any<Func<Message, CancellationToken, Task>>(), Arg.Any<MessageHandlerOptions>()))
+                .Throw(new Exception());
+
+            // ACT
+            _sut.Initialize();
+
+            // ASSERT
+            _telemetry.Received().TrackException(Arg.Any<Exception>());
+        }
+
+        [Fact]
+        public void ProcessSubscriptionWhenErrorSettingUpSubscriptionExceptionIsTracked()
+        {
+            // ARRANGE
+            _subscriptionClient
+                .When(_ => _.RegisterMessageHandler(Arg.Any<Func<Message, CancellationToken, Task>>(), Arg.Any<MessageHandlerOptions>()))
+                .Throw(new Exception());
+
+            // ACT
+            _sut.Initialize();
+
+            // ASSERT
+            _telemetry.Received().TrackException(Arg.Any<Exception>());
+        }
+
+        [Fact]
+        public void ExceptionReceivedHandlerWhenArgumentIsNotNullTracksExceptionAndReturnsTaskCompleted()
+        {
+            // ARRANGE
+            var exception = _fixture.Create<Exception>();
+            var action = _fixture.Create<string>();
+            var endpoint = _fixture.Create<string>();
+            var entityName = _fixture.Create<string>();
+            var clientId = _fixture.Create<string>();
+
+            // ACT
+            var actual = _sut.ExceptionReceivedHandler(new ExceptionReceivedEventArgs(exception, action, endpoint, entityName, clientId));
+
+            // ASSERT
+            _telemetry.Received().TrackException(exception);
+            Assert.Equal(Task.CompletedTask, actual);
         }
 
         public void Dispose()
