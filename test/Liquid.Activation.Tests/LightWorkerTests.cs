@@ -9,9 +9,11 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using AutoFixture;
+using FluentValidation;
 using Liquid.Base;
 using Liquid.Base.Domain;
 using Liquid.Domain;
+using Liquid.Domain.Base;
 using Liquid.Interfaces;
 using Newtonsoft.Json;
 using NSubstitute;
@@ -164,36 +166,132 @@ namespace Liquid.Activation.Tests
         [Fact]
         public void FactoryWhenNoErrorsThenDomainInstanceHasCacheSet()
         {
+            // ARRANGE
+            var cache = Substitute.For<ILightCache>();
+            Workbench.Instance.AddToCache(WorkbenchServiceType.Cache, cache);
+
+            // ACT
             var sut = new MockLightWorker();
             var actual = sut.Factory<MockDomain>();
 
+            // ASSERT
             Assert.NotNull(actual.Cache);
         }
 
         [Fact]
         public void FactoryWhenNoErrorsThenDomainInstanceHasCriticHandlerSet()
         {
+            // ARRANGE
             var sut = new MockLightWorker();
+            sut.ValidateInput(new MockViewModel());
+
+            // ACT
             var actual = sut.Factory<MockDomain>();
 
+            // ASSERT
             Assert.NotNull(actual.CritictHandler);
         }
 
         [Fact]
-        public void FactoryWhenThereAreInputErrorsThrows()
+        public void FactoryWhenViewModelHasErrorsThrows()
         {
             // ARRANGE
             var sut = new MockLightWorker();
-            sut.AddInputValidationErrorCode(string.Empty);
+            var viewModel = new MockViewModel
+            {
+                Age = string.Empty,
+            };
+
+            sut.ValidateInput(viewModel);
 
             // ACT & ASSERT
             Assert.ThrowsAny<Exception>(() => sut.Factory<MockDomain>());
         }
 
         [Fact]
-        public void ValidateInputWhenErrors()
+        public void ValidateInputWhenViewModelHasErrorsThenViewModelErrorsAreSet()
         {
-            throw new NotImplementedException();
+            // ARRANGE
+            var sut = new MockLightWorker();
+            var viewModel = new MockViewModel
+            {
+                Age = string.Empty,
+            };
+
+            // ACT
+            sut.ValidateInput(viewModel);
+
+            // ASSERT
+            Assert.NotEmpty(viewModel.InputErrors);
+        }
+
+        [Fact]
+        public void ValidateInputWhenPropertyHasErrorsThenViewModelErrorsAreSet()
+        {
+            var sut = new MockLightWorker();
+            var viewModel = new MockViewModel
+            {
+                ComplexProperty = new ComplexViewModel
+                {
+                    DateOfBirth = DateTime.Now + TimeSpan.FromDays(1),
+                },
+            };
+
+            sut.ValidateInput(viewModel);
+
+            Assert.NotEmpty(viewModel.InputErrors);
+        }
+
+        [Fact]
+        public void ValidateInputWhenPropertyIsListAndHasErrorsThenViewModelErrorsAreSet()
+        {
+            var sut = new MockLightWorker();
+            var viewModel = new MockViewModel
+            {
+                List = new List<ComplexViewModel>
+                {
+                    new ComplexViewModel { DateOfBirth = DateTime.Now + TimeSpan.FromDays(1) },
+                },
+            };
+
+            sut.ValidateInput(viewModel);
+
+            Assert.NotEmpty(viewModel.InputErrors);
+        }
+
+        // TODO: There are translation errors in the Critics class:(
+        [Fact]
+        public void TerminateWhenCriticsHandlerHasCritics()
+        {
+            // ARRANGE
+            var sut = new MockLightWorker();
+            var domain = sut.Factory<MockDomain>();
+
+            domain.CritictHandler.Critics.Add(Substitute.For<ICritic>());
+
+            var domainResponse = _fixture.Create<DomainResponse>();
+
+            // ACT & ASSERT
+            Assert.Throws<BusinessValidationException>(() => sut.Terminate(domainResponse));
+        }
+
+        // TODO: There are translation errors in the Critics class:(
+        [Fact]
+        public void TerminateWhenNoCriticsReturnsTheDomainResponse()
+        {
+            // ARRANGE
+            var sut = new MockLightWorker();
+            var domain = sut.Factory<MockDomain>();
+
+            domain.CritictHandler.Critics.Add(Substitute.For<ICritic>());
+
+            var domainResponse = _fixture.Create<DomainResponse>();
+
+            // ACT
+            var actual = sut.Terminate(domainResponse);
+
+            // ASSERT
+            Assert.Same(actual, domainResponse);
         }
 
         /// <summary>
@@ -212,7 +310,7 @@ namespace Liquid.Activation.Tests
         [SuppressMessage(
            "Design",
            "CA1034:Nested types should not be visible",
-           Justification = "Must be public so LightWorker access the class")]
+           Justification = "Must be public so LightWorker can access the class")]
         public class Foobar
         {
             public string Foo { get; set; } = "Bar";
@@ -221,7 +319,7 @@ namespace Liquid.Activation.Tests
         [SuppressMessage(
            "Design",
            "CA1034:Nested types should not be visible",
-           Justification = "Must be public so LightWorker access the class")]
+           Justification = "Must be public so LightWorker can access the class")]
         [MessageBus("asd")]
         public class MockLightWorker : LightWorker
         {
@@ -232,11 +330,6 @@ namespace Liquid.Activation.Tests
             public static List<(MethodInfo MethodInfo, QueueAttribute QueueAttribute)> QueueList => _queues
                 .Select(kvp => (kvp.Key, kvp.Value))
                 .ToList();
-
-            public new void AddInputValidationErrorCode(string errorCode)
-            {
-                base.AddInputValidationErrorCode(errorCode);
-            }
 
             [Topic("name", "subscriptionName", 10, true)]
             public static void TopicMethod()
@@ -253,6 +346,31 @@ namespace Liquid.Activation.Tests
                 where T : LightDomain, new()
             {
                 return base.Factory<T>();
+            }
+
+            public new void ValidateInput<T>(T viewModel)
+               where T : LightViewModel<T>, new()
+            {
+                base.ValidateInput(viewModel);
+            }
+
+            public new object Terminate(DomainResponse foo)
+            {
+                return base.Terminate(foo);
+            }
+        }
+
+        [SuppressMessage(
+          "Design",
+          "CA1034:Nested types should not be visible",
+          Justification = "Must be public so LightWorker can access the class")]
+        public class ComplexViewModel : LightViewModel<ComplexViewModel>
+        {
+            public DateTime DateOfBirth { get; set; } = DateTime.Now - TimeSpan.FromDays(1);
+
+            public override void Validate()
+            {
+                RuleFor(_ => _.DateOfBirth).LessThan(DateTime.Now);
             }
         }
 
@@ -297,6 +415,20 @@ namespace Liquid.Activation.Tests
 
         private class MockDomain : LightService
         {
+        }
+
+        private class MockViewModel : LightViewModel<MockViewModel>
+        {
+            public string Age { get; set; } = "13";
+
+            public ComplexViewModel ComplexProperty { get; set; }
+
+            public List<ComplexViewModel> List { get; set; }
+
+            public override void Validate()
+            {
+                RuleFor(_ => _.Age).NotEmpty();
+            }
         }
     }
 }
