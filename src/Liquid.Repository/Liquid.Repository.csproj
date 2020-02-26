@@ -20,6 +20,7 @@
     <PackageReference Include="MimeMapping" Version="1.0.1.15" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Liquid.Base\Liquid.Base.csproj" />
     <ProjectReference Include="..\Liquid.Domain\Liquid.Domain.csproj" />
     <ProjectReference Include="..\Liquid.Activation\Liquid.Activation.csproj" />
     <ProjectReference Include="..\Liquid.Runtime\Liquid.Runtime.csproj" />
