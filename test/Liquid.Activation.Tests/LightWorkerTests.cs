@@ -269,7 +269,7 @@ namespace Liquid.Activation.Tests
 
             domain.CritictHandler.Critics.Add(Substitute.For<ICritic>());
 
-            var domainResponse = _fixture.Create<DomainResponse>();
+            var domainResponse = new DomainResponse();
 
             // ACT & ASSERT
             Assert.Throws<BusinessValidationException>(() => sut.Terminate(domainResponse));
@@ -281,11 +281,7 @@ namespace Liquid.Activation.Tests
         {
             // ARRANGE
             var sut = new MockLightWorker();
-            var domain = sut.Factory<MockDomain>();
-
-            domain.CritictHandler.Critics.Add(Substitute.For<ICritic>());
-
-            var domainResponse = _fixture.Create<DomainResponse>();
+            var domainResponse = new DomainResponse();
 
             // ACT
             var actual = sut.Terminate(domainResponse);
