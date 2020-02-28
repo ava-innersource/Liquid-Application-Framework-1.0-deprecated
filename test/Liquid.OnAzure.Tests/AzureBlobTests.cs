@@ -39,8 +39,6 @@ namespace Liquid.OnAzure.Tests
 
         public AzureBlobTests()
         {
-            Workbench.Instance.Reset();
-
             Workbench.Instance.AddToCache(WorkbenchServiceType.Repository, _fakeLightRepository);
 
             _sut = new AzureBlob(new MediaStorageConfiguration
@@ -266,6 +264,7 @@ namespace Liquid.OnAzure.Tests
             {
                 _stream?.Dispose();
                 _lightAttachment?.Dispose();
+                Workbench.Instance.Reset();
             }
         }
 

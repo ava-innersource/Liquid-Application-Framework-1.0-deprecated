@@ -1,23 +1,125 @@
-﻿using Liquid.Base.Interfaces;
-using Liquid.Domain;
-using Liquid.Domain.Base;
-using Liquid.Activation;
-using Liquid.Runtime.Configuration.Base;
-using Liquid.Runtime.Telemetry;
-using Microsoft.Azure.ServiceBus;
+﻿// Copyright (c) Avanade Inc. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
+using Liquid.Activation;
+using Liquid.Domain;
+using Liquid.Domain.Base;
+using Liquid.Runtime.Configuration.Base;
+using Liquid.Runtime.Telemetry;
+using Microsoft.Azure.ServiceBus;
 
 namespace Liquid.OnAzure
 {
     /// <summary>
-    /// Implementation of the communication component between queues and topics of the Azure, this class is specific to azure
+    /// Defines an object capable of creating instances of <see cref="IQueueClient"/>.
+    /// </summary>
+    public interface IQueueClientFactory
+    {
+        /// <summary>
+        /// Creates a new instance of <see cref="IQueueClient"/>.
+        /// </summary>
+        /// <param name="connectionString">The connection string for the client.</param>
+        /// <param name="queueName">The name of the queue.</param>
+        /// <param name="receiveMode">The receive mode that the client will connect to the queue.</param>
+        /// <returns>A new instance of <see cref="IQueueClient"/>.</returns>
+        IQueueClient CreateClient(string connectionString, string queueName, ReceiveMode receiveMode);
+    }
+
+    /// <summary>
+    /// Defines an object capable of creating instances of <see cref="ISubscriptionClient"/>.
+    /// </summary>
+    public interface ISubscriptionClientFactory
+    {
+        /// <summary>
+        /// Creates a new instance of <see cref="ISubscriptionClient"/>.
+        /// </summary>
+        /// <param name="connectionString">The connection string for the client.</param>
+        /// <param name="topicName">The name of the topic to connect to.</param>
+        /// <param name="subscriptionName">Identifies the subscription to this topic.</param>
+        /// <param name="receiveMode">The receive mode that the client will connect to the queue.</param>
+        /// <returns>A new instance of <see cref="ISubscriptionClient"/>.</returns>
+        ISubscriptionClient CreateClient(string connectionString, string topicName, string subscriptionName, ReceiveMode receiveMode);
+    }
+
+    /// <summary>
+    /// Configuration source for <see cref="ServiceBus"/>.
+    /// </summary>
+    // TODO: should remove this class once we move to .NET configuration system
+    public interface IServiceBusConfigurationProvider
+    {
+        /// <summary>
+        /// Gets the configuration for a <see cref="ServiceBus"/>.
+        /// </summary>
+        /// <returns>
+        /// The current configuration for a service bus.
+        /// </returns>
+        ServiceBusConfiguration GetConfiguration();
+
+        /// <summary>
+        /// Gets the configuration for a <see cref="ServiceBus"/>.
+        /// </summary>
+        /// <param name="connectionName">
+        /// Identifies which connection should be retrieved from the file.
+        /// </param>
+        /// <returns>
+        /// The current configuration for a service bus.
+        /// </returns>
+        ServiceBusConfiguration GetConfiguration(string connectionName);
+    }
+
+    /// <summary>
+    /// Implementation of the communication component between queues and topics of the Azure, this class is specific to azure.
     /// </summary>
     public class ServiceBus : LightWorker, IWorkbenchService
     {
+        /// <summary>
+        /// Factory used to create a <see cref="IQueueClient"/>.
+        /// </summary>
+        private readonly IQueueClientFactory _queueClientFactory = new DefaultQueueClientFactory();
+
+        /// <summary>
+        /// Factory used to create a <see cref="ISubscriptionClient"/>.
+        /// </summary>
+        private readonly ISubscriptionClientFactory _subscriptionClientFactory = new DefaultSubscriptionClientFactory();
+
+        /// <summary>
+        /// Service that retrives a <see cref="ServiceBusConfiguration"/>.
+        /// </summary>
+        private readonly IServiceBusConfigurationProvider _configurationProvider = new DefaultServiceBusConfigurationProvider();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ServiceBus"/> class.
+        /// </summary>
+        public ServiceBus()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ServiceBus"/> class.
+        /// </summary>
+        /// <param name="queueClientFactory">
+        /// Dependency. Used to obtain new instances of a <see cref="IQueueClient"/>.
+        /// </param>
+        /// <param name="subscriptionClientFactory">
+        /// Dependency. Used to obtain new instances of a <see cref="ISubscriptionClient"/>.
+        /// </param>
+        /// <param name="configurationProvider">
+        /// Dependency. Used to retrieve a configuration for this class.
+        /// </param>
+        public ServiceBus(
+            IQueueClientFactory queueClientFactory,
+            ISubscriptionClientFactory subscriptionClientFactory,
+            IServiceBusConfigurationProvider configurationProvider)
+        {
+            _queueClientFactory = queueClientFactory ?? throw new ArgumentNullException(nameof(queueClientFactory));
+            _subscriptionClientFactory = subscriptionClientFactory ?? throw new ArgumentNullException(nameof(subscriptionClientFactory));
+            _configurationProvider = configurationProvider ?? throw new ArgumentNullException(nameof(configurationProvider));
+        }
+
         /// <summary>
         /// Implementation of the start process queue and process topic. It must be called  parent before start processes.
         /// </summary>
@@ -36,21 +138,21 @@ namespace Liquid.OnAzure
         /// <returns>StringConnection of the ServiceBus</returns>
         private string GetConnection<T>(KeyValuePair<MethodInfo, T> item)
         {
-            MethodInfo method = item.Key;
-            string connectionKey = GetKeyConnection(method);
-            ServiceBusConfiguration config = null;
+            var method = item.Key;
+            var connectionKey = GetKeyConnection(method);
+
+            ServiceBusConfiguration config;
             if (string.IsNullOrEmpty(connectionKey)) // Load specific settings if provided
             {
-                config = LightConfigurator.Config<ServiceBusConfiguration>($"{nameof(ServiceBus)}");
+                config = _configurationProvider.GetConfiguration();//LightConfigurator.Config<ServiceBusConfiguration>($"{nameof(ServiceBus)}");
             }
             else
             {
-                config = LightConfigurator.Config<ServiceBusConfiguration>($"{nameof(ServiceBus)}_{connectionKey}");
+                config = _configurationProvider.GetConfiguration(connectionKey);//LightConfigurator.Config<ServiceBusConfiguration>($"{nameof(ServiceBus)}_{connectionKey}");
             }
 
             return config.ConnectionString;
         }
-
 
         /// <summary>
         /// If  an error occurs in the processing, this method going to called
@@ -80,7 +182,7 @@ namespace Liquid.OnAzure
                     int takeQuantity = queue.Value.TakeQuantity;
 
                     //Register Trace on the telemetry 
-                    QueueClient queueReceiver = new QueueClient(GetConnection(queue), queueName, receiveMode);
+                    var queueReceiver = _queueClientFactory.CreateClient(GetConnection(queue), queueName, receiveMode);
 
                     //Register the method to process receive message
                     //The RegisterMessageHandler is validate for all register exist on the queue, without need loop for items
@@ -132,14 +234,17 @@ namespace Liquid.OnAzure
                     string topicName = topic.Value.TopicName;
                     string subscriptName = topic.Value.Subscription;
                     ReceiveMode receiveMode = ReceiveMode.PeekLock;
+
                     if (topic.Value.DeleteAfterRead)
                     {
                         receiveMode = ReceiveMode.ReceiveAndDelete;
                     }
+
                     int takeQuantity = topic.Value.TakeQuantity;
 
                     //Register Trace on the telemetry 
-                    SubscriptionClient subscriptionClient = new SubscriptionClient(GetConnection(topic), topicName, subscriptName, receiveMode, null);
+                    var subscriptionClient = _subscriptionClientFactory.CreateClient(
+                        GetConnection(topic), topicName, subscriptName, receiveMode);
 
                     //Register the method to process receive message
                     //The RegisterMessageHandler is validate for all register exist on the queue, without need loop for items
@@ -207,6 +312,50 @@ namespace Liquid.OnAzure
         protected override Task ProcessAsync()
         {
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Default implementation for <see cref="IQueueClientFactory"/>,
+        /// creates instances of <see cref="IQueueClient"/>.
+        /// </summary>
+        private class DefaultQueueClientFactory : IQueueClientFactory
+        {
+            /// <inheritdoc/>
+            public IQueueClient CreateClient(string connectionString, string queueName, ReceiveMode receiveMode)
+            {
+                return new QueueClient(connectionString, queueName, receiveMode);
+            }
+        }
+
+        /// <summary>
+        /// Default implementation for <see cref="ISubscriptionClientFactory"/>,
+        /// creates instances of <see cref="SubscriptionClient"/>.
+        /// </summary>
+        private class DefaultSubscriptionClientFactory : ISubscriptionClientFactory
+        {
+            /// <inheritdoc/>
+            public ISubscriptionClient CreateClient(string connectionString, string topicName, string subscriptionName, ReceiveMode mode)
+            {
+                return new SubscriptionClient(connectionString, topicName, subscriptionName, mode, null);
+            }
+        }
+
+        /// <summary>
+        /// Retrieves configuration using <see cref="LightConfigurator"/>.
+        /// </summary>
+        private class DefaultServiceBusConfigurationProvider : IServiceBusConfigurationProvider
+        {
+            /// <inheritdoc/>
+            public ServiceBusConfiguration GetConfiguration()
+            {
+                return LightConfigurator.Config<ServiceBusConfiguration>($"{nameof(ServiceBus)}");
+            }
+
+            /// <inheritdoc/>
+            public ServiceBusConfiguration GetConfiguration(string connectionKey)
+            {
+                return LightConfigurator.Config<ServiceBusConfiguration>($"{nameof(ServiceBus)}_{connectionKey}");
+            }
         }
     }
 }
