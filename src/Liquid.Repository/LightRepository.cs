@@ -490,7 +490,7 @@ namespace Liquid.Repository
             }
             catch (Exception exRegister)
             {
-                ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(exRegister);
+                Workbench.Instance.Telemetry.TrackException(exRegister);
             }
 
             return Task.FromResult<T>(default(T));
