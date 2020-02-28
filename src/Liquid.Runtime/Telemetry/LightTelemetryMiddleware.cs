@@ -99,7 +99,7 @@ namespace Liquid.Runtime.Telemetry
             }
             catch (Exception e)
             {
-                ((LightTelemetry)Workbench.Instance.Telemetry).TrackException(e);
+                Workbench.Instance.Telemetry.TrackException(e);
                 throw;
             }
         }

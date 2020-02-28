@@ -277,6 +277,11 @@ namespace Liquid.Base.Tests
                 throw new NotImplementedException();
             }
 
+            public void TrackException(Exception exception)
+            {
+                throw new NotImplementedException();
+            }
+
             public void TrackMetric(string metricLabel, double value)
             {
                 throw new NotImplementedException();
