@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:5636/",
+      "applicationUrl": "http://localhost:5639/",
       "sslPort": 0
     }
   },
@@ -13,15 +13,17 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "launchUrl": "swagger"
     },
-    "SmartHotel.Services.Notifications": {
+    "Liquid.Sample.CarRegistry": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:5639/"
+      "applicationUrl": "http://localhost:5639",
+      "launchUrl": "swagger"
     }
   }
 }
