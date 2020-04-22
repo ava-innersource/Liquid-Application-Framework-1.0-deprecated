@@ -271,3 +271,6 @@ __pycache__/
 /Frontend/Common Abstraction/React/amaw-react-liquid-frontend-1.0.0-alpha.12.tgz
 /Frontend/Common Abstraction/React
 /Frontend/Common Abstraction
+
+# LaunchSettings
+/samples/Liquid.Sample.CarRegistry/Properties/launchSettings.json
