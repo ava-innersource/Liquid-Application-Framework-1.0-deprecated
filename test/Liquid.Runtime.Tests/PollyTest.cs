@@ -44,7 +44,7 @@ namespace Liquid.Runtime.Tests
 
 
         [Fact]
-        public async Task ShouldUseDefaultPollyConfigAsRetryAttemptWhenIsBackOff()
+        public async Task ShouldUseMathPowAsRetryAttemptWhenIsBackOffTrue()
         {
             //Arrange
             _pollyConfiguration = new PollyConfiguration { IsBackOff = true, Retry = 3, Wait = 5 };
