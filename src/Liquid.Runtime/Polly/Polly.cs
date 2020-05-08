@@ -47,6 +47,7 @@ namespace Liquid.Runtime.Polly
                 }
             });
         }
+
         private void CallbackError<T>(DelegateResult<T> result, TimeSpan timeSpan, int retryCount)
         {
             Debug.WriteLine($"Request failed with {result.Result}. Waiting {timeSpan} before next retry. Retry attempt {retryCount}");

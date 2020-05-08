@@ -22,23 +22,23 @@ namespace Liquid.Runtime.Tests
         public async Task ResilientRequestWhenInvalidUrlAfterRetriedConfiguredAttempsThrowHttpRequest()
         {
             //Arrange
-            PollyConfiguration _pollyConfiguration = new PollyConfiguration { IsBackOff = true, Retry = 3, Wait = 5 };
+            PollyConfiguration pollyConfiguration = new PollyConfiguration { IsBackOff = true, Retry = 3, Wait = 5 };
             var url = "https://www.aipdhapsidh.com";
             //HttpResponseMessage result;
 
             //Action/Assert
-            await Assert.ThrowsAnyAsync<HttpRequestException>(async () => await _sut.ResilientRequest(url, _httpClient, _http, _pollyConfiguration).ConfigureAwait(true));
+            await Assert.ThrowsAnyAsync<HttpRequestException>(async () => await _sut.ResilientRequest(url, _httpClient, _http, pollyConfiguration).ConfigureAwait(true));
         }
 
         [Fact]
         public async Task ResilientRequestShouldUseMathPowAsRetryAttemptWhenIsBackOffTrue()
         {
             //Arrange
-            PollyConfiguration _pollyConfiguration = new PollyConfiguration { IsBackOff = true, Retry = 3, Wait = 5 };
+            PollyConfiguration pollyConfiguration = new PollyConfiguration { IsBackOff = true, Retry = 3, Wait = 5 };
             var url = "https://www.google.com";
 
             //Action
-            using (HttpResponseMessage result = await _sut.ResilientRequest(url, _httpClient, _http, _pollyConfiguration).ConfigureAwait(true))
+            using (HttpResponseMessage result = await _sut.ResilientRequest(url, _httpClient, _http, pollyConfiguration).ConfigureAwait(true))
             {
                 //Assert
                 Assert.True(result.IsSuccessStatusCode);
@@ -49,10 +49,10 @@ namespace Liquid.Runtime.Tests
         public async Task ResilientRequestShouldUseDefaultPollyConfigAsRetryAttemptWhenIsBackOffFalse()
         {
             //Arrange
-            PollyConfiguration _pollyConfiguration = new PollyConfiguration { IsBackOff = false, Retry = 3, Wait = 5 };
+            PollyConfiguration pollyConfiguration = new PollyConfiguration { IsBackOff = false, Retry = 3, Wait = 5 };
             var url = "https://www.google.com";
             //Action
-            using (HttpResponseMessage result = await _sut.ResilientRequest(url, _httpClient, _http, _pollyConfiguration).ConfigureAwait(false))
+            using (HttpResponseMessage result = await _sut.ResilientRequest(url, _httpClient, _http, pollyConfiguration).ConfigureAwait(false))
             {
                 //Assert
                 Assert.True(result.IsSuccessStatusCode);
