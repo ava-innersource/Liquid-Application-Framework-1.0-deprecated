@@ -4,9 +4,7 @@ using Liquid.Runtime.Telemetry;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Threading.Tasks;
 
 namespace Liquid.OnAzure
 {
@@ -20,14 +18,29 @@ namespace Liquid.OnAzure
         //TelemetryClient is responsible for sending all telemetry requests to the azure.
         //It is still possible to make settings regarding the hierarchy of messages.
         //This setting is changeable as desired by the developer.
-        private static TelemetryClient TelemetryClient;               
-              
-        public AppInsights() { }
+        private static TelemetryClient TelemetryClient;
+        private AppInsightsConfiguration _appInsightsConfiguration;
+
+        public AppInsights() 
+        { 
+
+        }
+
+        public AppInsights(AppInsightsConfiguration configuration)
+        {
+            _appInsightsConfiguration = configuration;
+        }
 
         //TrackEvent is a wrapper that sends messages in the event format to AppInsights.
         public override void TrackEvent(params object[] events)
         {
-            TelemetryClient.TrackEvent(new EventTelemetry() { Name = (string)events[0] });
+            TelemetryClient.TrackEvent
+            (
+                new EventTelemetry() 
+                { 
+                    Name = (string)events[0] 
+                }
+            );
         }
         //TrackMetric sends to the AppInsights metrics related to some point of view. 
         //For example, you can measure how much time was spent to persist data in the database.
@@ -59,11 +72,18 @@ namespace Liquid.OnAzure
         // Also, it will instantiate a telemetry client to send all Azure portal pro requests.        
         public override void Initialize()
         {
-            AppInsightsConfiguration appInsightsConfiguration = LightConfigurator.Config<AppInsightsConfiguration>("ApplicationInsights");
+            _appInsightsConfiguration = LightConfigurator.Config<AppInsightsConfiguration>("ApplicationInsights");
 
+            Initialize(_appInsightsConfiguration);
+        }
+        // Initialize will retrieve the authentication token from the configuration file set in "appsettings.json". 
+        // Also, it will instantiate a telemetry client to send all Azure portal pro requests.        
+        public void Initialize(AppInsightsConfiguration configuration)
+        {
+            
             TelemetryConfiguration aiConfig = new TelemetryConfiguration();
-            aiConfig.InstrumentationKey = appInsightsConfiguration.InstrumentationKey;
-                      
+            aiConfig.InstrumentationKey = configuration.InstrumentationKey;
+
             // automatically correlate all telemetry data with request
             aiConfig.TelemetryInitializers.Add(new OperationCorrelationTelemetryInitializer());
 
