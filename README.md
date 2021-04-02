@@ -1,3 +1,9 @@
+# DEPRECATED
+This version is no longer supported and will not receive any updates nor bug fixes, please consider using the [new version](https://github.com/Avanade/Liquid-Application-Framework) instead.
+We've made significative breaking changes on the new version of Liquid Application Framework. So, the old and new versions are not compatible and, also, there is no easy way to migrate from this to the new one.
+This repo will be keeped only for historical purposes and to allow anyone, relying on this version, to fork the code and maintain it from there, if needed.
+
+
 # Enter Liquid ![CI Badge](https://github.com/Avanade/Liquid-Application-Framework/workflows/CI/badge.svg)
 Liquid is a **multi-cloud** framework designed to **accelerate the development** of cloud-native microservices while avoiding coupling your code to specific cloud providers. 
 
