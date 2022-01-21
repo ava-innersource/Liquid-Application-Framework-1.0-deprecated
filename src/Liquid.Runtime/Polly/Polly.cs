@@ -1,11 +1,9 @@
 ﻿using Polly;
 using Polly.Retry;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Liquid.Runtime.Polly
@@ -16,21 +14,22 @@ namespace Liquid.Runtime.Polly
         {
             PollyConfiguration pollyConfig = (PollyConfiguration)pollyconfiguration;
             AsyncRetryPolicy<HttpResponseMessage> retryPolicy = null;
-
-            // TODO: Please let's remove this ternary
-            retryPolicy = pollyConfig.IsBackOff == true ? Policy.HandleResult<HttpResponseMessage>(r => r.StatusCode.Equals(HttpStatusCode.InternalServerError))
-                .Or<WebException>().Or<HttpRequestException>()
+            if (pollyConfig.IsBackOff == true)
+            {
+                retryPolicy = Policy.HandleResult<HttpResponseMessage>(r => r.StatusCode.Equals(HttpStatusCode.InternalServerError)).Or<WebException>().Or<HttpRequestException>()
                     .WaitAndRetryAsync(pollyConfig.Retry, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (result, timeSpan, retryCount, context) =>
                     {
                         CallbackError<HttpResponseMessage>(result, timeSpan, retryCount);
-                    }) :
-
-                    Policy.HandleResult<HttpResponseMessage>(r => r.StatusCode.Equals(HttpStatusCode.InternalServerError)).Or<WebException>().Or<HttpRequestException>()
+                    });
+            }
+            else
+            {
+                retryPolicy = Policy.HandleResult<HttpResponseMessage>(r => r.StatusCode.Equals(HttpStatusCode.InternalServerError)).Or<WebException>().Or<HttpRequestException>()
                     .WaitAndRetryAsync(pollyConfig.Retry, retryAttempt => TimeSpan.FromSeconds(pollyConfig.Wait), (result, timeSpan, retryCount, context) =>
                     {
                         CallbackError<HttpResponseMessage>(result, timeSpan, retryCount);
                     });
-
+            }
            return await retryPolicy.ExecuteAsync(() =>
             {
                 switch (http)
